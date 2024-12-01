@@ -1,0 +1,88 @@
+@use 'normalize';
+
+$main-color: #1d00a0;
+$sub-color: #eeeeee;
+
+%shadow {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  border: none;
+  border-radius: 5px;
+}
+
+@mixin card($color) {
+  @extend %shadow;
+  position: relative;
+  background-color: white;
+  width: 25%;
+  margin-right: 2%;
+  padding: 1%;
+  padding-left: 2%;
+  border-left: 4px solid $color;
+}
+
+.nav-bar {
+  @extend %shadow;
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 5vh;
+  padding-right: 2%;
+}
+
+.title {
+  height: 60%;
+  width: 15%;
+  display: flex;
+  margin-left: 50px;
+  border: 0.5px solid gray;
+  border-radius: 5px;
+  align-items: center;
+  justify-content: center;
+}
+
+.content {
+  width: 100%;
+  height: 100%;
+  background-color: $sub-color;
+  padding-top: 1%;
+  padding-left: 1%;
+}
+
+.card-blue {
+  @include card(skyblue);
+}
+
+.card-green {
+  @include card(green);
+}
+
+.card-icon {
+  position: absolute;
+  color: gray;
+  top: 30%;
+  left: 80%;
+  font-size: 300%;
+}
+
+.chart {
+  @extend %shadow;
+  background-color: white;
+  height: 50vh;
+  width: 100%;
+}
+
+.content-head {
+  background-color: $sub-color;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  margin: 0;
+  align-content: center;
+  padding: 20px;
+  padding-left: 2%;
+}
+
+.tasks {
+  @extend %shadow;
+  background-color: white;
+  width: 38%;
+  height: 100%;
+}
