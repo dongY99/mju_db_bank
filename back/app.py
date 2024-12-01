@@ -28,50 +28,52 @@ def index():
 
 #post, db 삽입
 def add_customer():
-    birth_date = datetime.date(1999, 1, 1)
-    formatted_date = birth_date.strftime("%Y-%m-%d")
     try:
-        # 데이터 검증
-        주민번호 = '123'
-        이름 = 'lee'
-        주소 = 'magok'
-        생년월일 = formatted_date
-        이메일 = 'hanmeot'
-        전화번호 = '456'
-        직업 = 'student'
+        # 클라이언트로부터 JSON 데이터 받기
+        data = request.get_json()
 
+        # 필수 필드 값 추출
+        주민번호 = data.get('주민번호')
+        이름 = data.get('이름')
+        생년월일 = data.get('생년월일')
+        
+        # 필수 필드가 없으면 오류 반환
         if not 주민번호 or not 이름 or not 생년월일:
             return jsonify({"error": "주민번호, 이름, 생년월일은 필수 항목입니다."}), 400
 
-        # 기존 고객 확인
+        # 이미 존재하는 고객인지 확인 (중복 삽입 방지)
         existing_customer = db.session.get(Customer, 주민번호)
         if existing_customer:
             return jsonify({"error": "이미 존재하는 주민번호입니다."}), 409
 
-        # 새 고객 객체 생성
+        # 새로운 고객 객체 생성
         new_customer = Customer(
             주민번호=주민번호,
             이름=이름,
-            주소=주소,
+            주소=data.get('주소', None),  # 선택적 필드
             생년월일=생년월일,
-            이메일=이메일,
-            전화번호=전화번호,
-            직업=직업
+            이메일=data.get('이메일', None),
+            전화번호=data.get('전화번호', None),
+            직업=data.get('직업', None)
         )
 
-        # 데이터베이스에 저장
+        # 데이터베이스에 추가
         db.session.add(new_customer)
-        db.session.commit()
+        db.session.commit()  # 커밋하여 데이터 저장
 
-        return jsonify({"message": "고객 추가 완료", "customer": {
-            "주민번호": 주민번호,
-            "이름": 이름,
-            "주소": 주소,
-            "생년월일": 생년월일,
-            "이메일": 이메일,
-            "전화번호": 전화번호,
-            "직업": 직업
-        }}), 201
+        # 성공 메시지 반환
+        return jsonify({
+            "message": "고객이 성공적으로 추가되었습니다.",
+            "customer": {
+                "주민번호": 주민번호,
+                "이름": 이름,
+                "주소": new_customer.주소,
+                "생년월일": new_customer.생년월일,
+                "이메일": new_customer.이메일,
+                "전화번호": new_customer.전화번호,
+                "직업": new_customer.직업
+            }
+        }), 201
 
     except Exception as e:
         db.session.rollback()  # 오류 발생 시 롤백
