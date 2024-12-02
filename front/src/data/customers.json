@@ -1,0 +1,47 @@
+[
+  {
+    "Resident_Registration_Number": "123456-7890123",
+    "Name": "홍길동",
+    "Address": "서울특별시 강남구",
+    "Date_Of_Birth": "1985-05-01",
+    "Email": "hong@example.com",
+    "Phone_Number": "010-1234-5678",
+    "Occupation": "은행원"
+  },
+  {
+    "Resident_Registration_Number": "234567-8901234",
+    "Name": "김철수",
+    "Address": "부산광역시 해운대구",
+    "Date_Of_Birth": "1990-03-15",
+    "Email": "kim@example.com",
+    "Phone_Number": "010-9876-5432",
+    "Occupation": "프로그래머"
+  },
+  {
+    "Resident_Registration_Number": "345678-9012345",
+    "Name": "이동엽",
+    "Address": "서울특별시 강서구",
+    "Date_Of_Birth": "1985-12-01",
+    "Email": "lee@example.com",
+    "Phone_Number": "010-7162-1234",
+    "Occupation": "가택"
+  },
+  {
+    "Resident_Registration_Number": "456789-0123456",
+    "Name": "로렌",
+    "Address": "서울특별시 강북구",
+    "Date_Of_Birth": "1985-11-01",
+    "Email": "loo@example.com",
+    "Phone_Number": "010-2534-7731",
+    "Occupation": "침대"
+  },
+  {
+    "Resident_Registration_Number": "567890-1234567",
+    "Name": "입숨",
+    "Address": "서울특별시 강동구",
+    "Date_Of_Birth": "1985-10-01",
+    "Email": "ipsum@example.com",
+    "Phone_Number": "010-8456-1237",
+    "Occupation": "백수"
+  }
+]

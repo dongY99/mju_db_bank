@@ -13,6 +13,7 @@
 import NavBar from './components/NavBar.vue';
 import DashboardComponent from './components/DashboardComponent.vue';
 import ChartComponent from './components/ChartComponent.vue';
+import { mapActions } from 'vuex';
 
 export default {
   name: 'App',
@@ -20,10 +21,23 @@ export default {
     NavBar,
     DashboardComponent,
     ChartComponent,
-  }
+  },
+  methods: {
+    ...mapActions(['fetchCustomers' , 'fetchDepositAccount', 'fetchCard', 'fetchTransations']), // 액션 호출
+  },
+  mounted() {
+    this.fetchCustomers().then(() => {
+      console.log('customer data load')
+    }); // 앱 시작 시 데이터 로드
+    this.fetchDepositAccount().then(() => {
+      console.log('DepositAccount data load')
+    });
+    this.fetchCard().then(() => {
+      console.log('card data load')
+    });
+    this.fetchTransations().then(() => {
+      console.log('Transations data load')
+    });
+  },
 };
 </script>
-
-<style>
-.title {}
-</style>

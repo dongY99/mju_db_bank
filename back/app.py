@@ -26,6 +26,23 @@ with app.app_context():
 def index():
     return render_template('index.html')
 
+@app.route('/api/customers')
+def getCutomers():
+    try:
+        customers = Customer.query.all()
+        customer_list = [{
+            "Resident_Registration_Number": c.Resident_Registration_Number,
+            "Name": c.Name,
+            "Address": c.Address,
+            "Date_Of_Birth": c.Date_Of_Birth.strftime('%Y-%m-%d') if c.Date_Of_Birth else None,
+            "Email": c.Email,
+            "Phone_Number": c.Phone_Number,
+            "Occupation": c.Occupation
+        } for c in customers]
+        return jsonify(customer_list), 200
+    except Exception as e:
+        return jsonify({"error": "Error fetching customers", "details": str(e)}), 500
+    
 #post, db 삽입
 def add_customer():
     try:
