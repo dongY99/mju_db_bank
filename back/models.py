@@ -4,7 +4,7 @@ db = SQLAlchemy()
 
 class Customer(db.Model):
     __tablename__ = 'customers'
-    Resident_Registration_Number = db.Column(db.String(13), primary_key=True)  # Resident_Registration_Number는 PK
+    Resident_Registration_Number = db.Column(db.String(14), primary_key=True)  # Resident_Registration_Number는 PK
     Name = db.Column(db.String(50), nullable=False)
     Address = db.Column(db.String(255), nullable=True)
     Date_Of_Birth = db.Column(db.Date, nullable=False)

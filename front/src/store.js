@@ -15,6 +15,10 @@ const store = createStore({
     setCustomers(state, customers) {
       state.customers = customers
     },
+    addCustomer(state, customer) {
+      state.customers.push(customer); // 새 고객 추가
+    },
+
     setDepositAccount(state, depositAccount) {
       state.depositAccount = depositAccount
     },
@@ -40,7 +44,7 @@ const store = createStore({
 
     async fetchDepositAccount({commit}) {
       try {
-        const response = await axios.get('/api/depositAccount');
+        const response = await axios.get('/api/deposit_account');
 
         commit('setDepositAccount', response.data);        
       } catch(error) {
@@ -50,23 +54,33 @@ const store = createStore({
 
     async fetchCard({commit}) {
       try {
-        const response = await axios.get('/api/Card');
+        const response = await axios.get('/api/card');
 
         commit('setCard', response.data);        
       } catch(error) {
         console.error('fetch card fail: ', error);
       }
     },
-    
+
     async fetchTransations({commit}) {
       try {
-        const response = await axios.get('/api/Transations');
+        const response = await axios.get('/api/transations');
 
         commit('setTransations', response.data);        
       } catch(error) {
         console.error('fetch transations fail: ', error);
       }
-    }
+    },
+
+    async postCustomer({ commit }, customer) {
+      try {
+        const response = await axios.post('/add_customer', customer);
+        commit('addCustomer', response.data.customer); // Store에 새 고객 추가
+      } catch (error) {
+        console.error('Error posting customer:', error);
+        throw error; // Vue 컴포넌트에서 에러를 처리하도록 전달
+      }
+    },
   },
 
   getters: {
