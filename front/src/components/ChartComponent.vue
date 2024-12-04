@@ -23,7 +23,7 @@
         </div>
       </div>
     </nav>
-    <div style="margin-left: 10px; overflow-y: scroll;">
+    <div style="margin-left: 10px; overflow-y: scroll; min-height: 100%;">
       <div v-if="searchType == 0">
         <CustomersPage />
       </div>

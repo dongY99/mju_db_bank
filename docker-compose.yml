@@ -10,4 +10,4 @@ services:
       - MYSQL_USER=user
       - MYSQL_PASSWORD=password
     volumes:
-      - $PWD/data:/var/lib/mysql
+      - C:\mju_db_bank\data:/var/lib/mysql

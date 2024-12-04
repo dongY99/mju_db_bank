@@ -198,6 +198,7 @@ def add_deposit_account():
         Account_Type = data.get("Account_Type")
         Balance = data.get("Balance", 0.0)  # 기본값 설정
         Data_Of_Opening = data.get("Data_Of_Opening")
+        Card_Application_Status = data.get("Card_Application_Status")
         Customer_Resident_Registration_Number = data.get(
             "Customer_Resident_Registration_Number"
         )
@@ -229,6 +230,7 @@ def add_deposit_account():
             Account_Type=Account_Type,
             Balance=Balance,
             Data_Of_Opening=Data_Of_Opening,
+            Card_Application_Statu=Card_Application_Status,
             Customer_Resident_Registration_Number=Customer_Resident_Registration_Number,
         )
 
@@ -246,6 +248,7 @@ def add_deposit_account():
                         "Account_Type": Account_Type,
                         "Balance": Balance,
                         "Data_Of_Opening": Data_Of_Opening,
+                        "Card_Application_Status": Card_Application_Status,
                         "Customer_Resident_Registration_Number": Customer_Resident_Registration_Number,
                     },
                 }
@@ -336,6 +339,7 @@ def add_card():
     try:
         # 클라이언트로부터 JSON 데이터 받기
         data = request.get_json()
+        print(data)
 
         # 필수 필드 값 추출
         Card_ID = data.get("Card_ID")
@@ -346,7 +350,7 @@ def add_card():
         Customer_Resident_Registration_Number = data.get(
             "Customer_Resident_Registration_Number"
         )
-        Deposit_Account_ID = data.get("Deposit_Account_ID", None)  # 선택적 필드
+        Deposit_Account_ID = data.get("Deposit_Account_ID")
 
         # 필수 필드가 없으면 오류 반환
         if (
@@ -356,6 +360,7 @@ def add_card():
             or not Payment_Date
             or not Date_Of_Application
             or not Customer_Resident_Registration_Number
+            or not Deposit_Account_ID
         ):
             return (
                 jsonify(
@@ -371,13 +376,10 @@ def add_card():
         if not customer:
             return jsonify({"error": "존재하지 않는 고객입니다."}), 404
 
-        # 예금계좌 확인 (선택적 필드)
-        if Deposit_Account_ID:
-            deposit_account = db.session.get(DepositAccount, Deposit_Account_ID)
-            if not deposit_account:
-                return jsonify({"error": "존재하지 않는 예금계좌입니다."}), 404
-        else:
-            deposit_account = None
+        # 예금계좌 확인
+        deposit_account = db.session.get(DepositAccount, Deposit_Account_ID)
+        if not deposit_account:
+            return jsonify({"error": "존재하지 않는 예금계좌입니다."}), 404
 
         # 새로운 카드 객체 생성
         new_card = Card(
@@ -387,7 +389,7 @@ def add_card():
             Payment_Date=Payment_Date,
             Date_Of_Application=Date_Of_Application,
             Customer_Resident_Registration_Number=Customer_Resident_Registration_Number,
-            Deposit_Account_ID=Deposit_Account_ID,  # 예금계좌는 선택적
+            Deposit_Account_ID=Deposit_Account_ID,
         )
 
         # 데이터베이스에 추가

@@ -7,7 +7,7 @@ const store = createStore({
       customers: [],
       depositAccount: [],
       card: [],
-      transations: [],
+      transactions: [],
     }
   },
 
@@ -29,8 +29,15 @@ const store = createStore({
     setCard(state, card) {
       state.card = card
     },
-    setTransations(state, transations) {
-      state.transations = transations
+    addCard(state, card) {
+      state.card.push(card);
+    },
+
+    setTransactions(state, transaction) {
+      state.transactions = transaction
+    },
+    addTransactions(state, transaction) {
+      state.transactions.push(transaction);
     }
 
   },
@@ -66,13 +73,13 @@ const store = createStore({
       }
     },
 
-    async fetchTransations({ commit }) {
+    async fetchtransaction({ commit }) {
       try {
-        const response = await axios.get('/api/transations');
+        const response = await axios.get('/api/transactions');
 
-        commit('setTransations', response.data);
+        commit('setTransactions', response.data);
       } catch (error) {
-        console.error('fetch transations fail: ', error);
+        console.error('fetch transaction fail: ', error);
       }
     },
 
@@ -95,6 +102,26 @@ const store = createStore({
         throw error;
       }
     },
+
+    async postCard({ commit }, card) {
+      try {
+        const response = await axios.post("/add_card", card);
+        commit("addCard", response.data.card); // Vuex 상태 업데이트
+      } catch (error) {
+        console.error("Error posting card:", error);
+        throw error;
+      }
+    },
+
+    async postTransactions({ commit }, transactions) {
+      try {
+        const response = await axios.post("/add_transaction", transactions);
+        commit("addTransactions", response.data.transaction); // Vuex 상태 업데이트
+      } catch (error) {
+        console.error("Error posting transaction:", error);
+        throw error;
+      }
+    },
   },
 
   getters: {
@@ -107,8 +134,8 @@ const store = createStore({
     allCard(state) {
       return state.card;
     },
-    allTransations(state) {
-      return state.transations;
+    alltransaction(state) {
+      return state.transactions;
     },
   }
 })
