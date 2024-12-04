@@ -10,41 +10,42 @@
                 Search
               </button>
             </form>
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                aria-expanded="false">
-                Dropdown link
-              </a>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#">Action</a></li>
-                <li><a class="dropdown-item" href="#">Another action</a></li>
-                <li><a class="dropdown-item" href="#">Something else here</a></li>
-              </ul>
-            </li>
-
-            <ModalDialog />
+            <div class="mx-3">
+              <select v-model="searchType" class="form-select">
+                <option :value=0>고객</option>
+                <option :value=1>예금계좌</option>
+                <option :value=2>거래내역</option>
+                <option :value=3>카드</option>
+              </select>
+            </div>
+            <CustomerForm />
           </ul>
         </div>
       </div>
     </nav>
-    <div style="margin-left: 10px;">
-      <ul v-for="(customer, index) in customers" :key="index" class="list-group list-group-horizontal row">
-        <li class="list-group-item col"> {{ customer.Resident_Registration_Number }}</li>
-        <li class="list-group-item col"> {{ customer.Name }}</li>
-        <li class="list-group-item col"> {{ customer.Address }}</li>
-        <li class="list-group-item col"> {{ customer.Date_Of_Birth }}</li>
-        <li class="list-group-item col"> {{ customer.Email }}</li>
-        <li class="list-group-item col"> {{ customer.Phone_Number }}</li>
-        <li class="list-group-item col"> {{ customer.Occupation }}</li>
-      </ul>
+    <div style="margin-left: 10px; overflow-y: scroll;">
+      <div v-if="searchType == 0">
+        <CustomersPage />
+      </div>
+      <div v-if="searchType == 1">
+        <DepositAccountPage />
+      </div>
+      <div v-if="searchType == 2">
+        <TransactionPage />
+      </div>
+      <div v-if="searchType == 3">
+        <CardPage />
+      </div>
     </div>
-    <button @click="fetchData">데이터 가져오기</button>
   </div>
 </template>
 
 <script>
-import ModalDialog from './ModalDialog.vue';
-import { mapState } from "vuex";
+import CustomerForm from './CustomerForm.vue';
+import CustomersPage from './CustomersPage.vue';
+import DepositAccountPage from './DepositAccountPage.vue';
+import TransactionPage from './TransactionPage.vue';
+import CardPage from './CardPage.vue';
 
 export default {
   name: 'ChartComponent',
@@ -53,12 +54,13 @@ export default {
       searchType: 0
     };
   },
-  computed: {
-    ...mapState(["customers"]),
-  },
 
   components: {
-    ModalDialog
+    CustomerForm,
+    CustomersPage,
+    DepositAccountPage,
+    TransactionPage,
+    CardPage,
   }
 };
 </script>

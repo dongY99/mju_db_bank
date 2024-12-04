@@ -24,7 +24,7 @@ class DepositAccount(db.Model):
     Balance = db.Column(db.Float, nullable=False)
     Card_Application_Status = db.Column(db.Boolean, default=False)
     Data_Of_Opening = db.Column(db.Date, nullable=False)
-    Customer_Resident_Registration_Number = db.Column(db.String(13), db.ForeignKey('customers.Resident_Registration_Number'), nullable=False)
+    Customer_Resident_Registration_Number = db.Column(db.String(14), db.ForeignKey('customers.Resident_Registration_Number'), nullable=False)
 
     # Relationship
     transactions = db.relationship('Transaction', backref='deposit_account', lazy=True)
@@ -48,5 +48,5 @@ class Card(db.Model):
     Limit_Amount = db.Column(db.Float, nullable=False)
     Payment_Date = db.Column(db.Date, nullable=False)
     Card_Type = db.Column(db.String(50), nullable=False)
-    Customer_Resident_Registration_Number = db.Column(db.String(13), db.ForeignKey('customers.Resident_Registration_Number'), nullable=False)
+    Customer_Resident_Registration_Number = db.Column(db.String(14), db.ForeignKey('customers.Resident_Registration_Number'), nullable=False)
     Deposit_Account_ID = db.Column(db.Integer, db.ForeignKey('deposit_accounts.Deposit_Account_ID'), nullable=True)

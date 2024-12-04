@@ -93,9 +93,9 @@
 
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetData">
-              Close
+              닫기
             </button>
-            <button type="button" class="btn btn-primary" :disabled="hasErrors" @click="addCustomer">
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" :disabled="hasErrors" @click="addCustomer">
               완료
             </button>
           </div>
@@ -109,7 +109,7 @@
 import { mapActions } from 'vuex';
 
 export default {
-  name: 'ModalDialog',
+  name: 'CustomerForm',
   data() {
     return {
       selectedYear: null,
@@ -244,25 +244,7 @@ export default {
         await this.postCustomer(this.customer); // 백엔드에 POST 요청 및 Store 업데이트
 
         // 입력 필드 초기화
-        this.customer = {
-          Resident_Registration_Number: '',
-          Name: '',
-          Address: '',
-          Date_Of_Birth: '',
-          Email: '',
-          Phone_Number: '',
-          Occupation: '',
-        };
-        this.selectedYear = null;
-        this.selectedMonth = null;
-        this.selectedDay = null;
-        this.Resident_Registration_Number_First = "";
-        this.Resident_Registration_Number_Second = "";
-        this.Phone_First = "";
-        this.Phone_Middle = "";
-        this.Phone_Last = "";
-        this.Email_First = "";
-        this.Email_Second = "";
+        this.resetData();
 
         console.log("Customer Added:", this.customer);
         alert("회원 정보가 성공적으로 저장되었습니다!");

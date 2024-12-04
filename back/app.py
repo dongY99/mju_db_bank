@@ -254,6 +254,7 @@ def add_deposit_account():
         )
 
     except Exception as e:
+        print(f"Error details: {str(e)}")
         db.session.rollback()  # 오류 발생 시 롤백
         return jsonify({"error": "예금계좌 추가 중 오류 발생", "details": str(e)}), 500
 
@@ -326,6 +327,7 @@ def add_transaction():
         )
 
     except Exception as e:
+        print(f"Error details: {str(e)}")
         db.session.rollback()  # 오류 발생 시 롤백
         return jsonify({"error": "트랜잭션 추가 중 오류 발생", "details": str(e)}), 500
 
@@ -412,6 +414,7 @@ def add_card():
         )
 
     except Exception as e:
+        print(f"Error details: {str(e)}")
         db.session.rollback()  # 오류 발생 시 롤백
         return jsonify({"error": "카드 추가 중 오류 발생", "details": str(e)}), 500
 

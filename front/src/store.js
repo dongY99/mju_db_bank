@@ -2,7 +2,7 @@ import { createStore } from 'vuex'
 import axios from 'axios'
 
 const store = createStore({
-  state(){
+  state() {
     return {
       customers: [],
       depositAccount: [],
@@ -22,6 +22,10 @@ const store = createStore({
     setDepositAccount(state, depositAccount) {
       state.depositAccount = depositAccount
     },
+    addDepositAccount(state, depositAccount) {
+      state.depositAccount.push(depositAccount);
+    },
+
     setCard(state, card) {
       state.card = card
     },
@@ -32,42 +36,42 @@ const store = createStore({
   },
 
   actions: {
-    async fetchCustomers({commit}) {
+    async fetchCustomers({ commit }) {
       try {
         const response = await axios.get('/api/customers');
 
-        commit('setCustomers', response.data);        
-      } catch(error) {
+        commit('setCustomers', response.data);
+      } catch (error) {
         console.error('fetch customers fail: ', error);
       }
     },
 
-    async fetchDepositAccount({commit}) {
+    async fetchDepositAccount({ commit }) {
       try {
         const response = await axios.get('/api/deposit_account');
 
-        commit('setDepositAccount', response.data);        
-      } catch(error) {
+        commit('setDepositAccount', response.data);
+      } catch (error) {
         console.error('fetch depositAccount fail: ', error);
       }
     },
 
-    async fetchCard({commit}) {
+    async fetchCard({ commit }) {
       try {
         const response = await axios.get('/api/card');
 
-        commit('setCard', response.data);        
-      } catch(error) {
+        commit('setCard', response.data);
+      } catch (error) {
         console.error('fetch card fail: ', error);
       }
     },
 
-    async fetchTransations({commit}) {
+    async fetchTransations({ commit }) {
       try {
         const response = await axios.get('/api/transations');
 
-        commit('setTransations', response.data);        
-      } catch(error) {
+        commit('setTransations', response.data);
+      } catch (error) {
         console.error('fetch transations fail: ', error);
       }
     },
@@ -79,6 +83,16 @@ const store = createStore({
       } catch (error) {
         console.error('Error posting customer:', error);
         throw error; // Vue 컴포넌트에서 에러를 처리하도록 전달
+      }
+    },
+
+    async postDepositAccount({ commit }, depositAccount) {
+      try {
+        const response = await axios.post("/add_deposit_account", depositAccount);
+        commit("addDepositAccount", response.data.deposit_account); // Vuex 상태 업데이트
+      } catch (error) {
+        console.error("Error posting deposit account:", error);
+        throw error;
       }
     },
   },
