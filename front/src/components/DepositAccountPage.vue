@@ -41,7 +41,7 @@
     <li class="list-group-item col"> {{ deposit.Card_Application_Status }}</li>
     <li class="list-group-item col"> {{ deposit.Data_Of_Opening }}</li>
     <li class="list-group-item col"> {{ deposit.Customer_Resident_Registration_Number }}</li>
-    <CardForm :depositAccount="depositAccount" :index="index" class="col"/>
+    <CardForm :deposit="deposit" :index="index" class="col"/>
   </ul>
 </template>
 

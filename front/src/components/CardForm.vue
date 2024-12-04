@@ -6,7 +6,8 @@
     </button>
 
     <!-- Modal -->
-    <div class="modal fade" :id="'cardModal' + index" tabindex="-1" :aria-labelledby="'cardModalLabel' + index" aria-hidden="true">
+    <div class="modal fade" :id="'cardModal' + index" tabindex="-1" :aria-labelledby="'cardModalLabel' + index"
+      aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
@@ -32,10 +33,11 @@
 
             <!-- 결제일 -->
             <div class="input-group mb-3">
-              <span class="input-group-text">결제일</span>
-              <input v-model="card.Payment_Date" type="date" class="form-control"
-                :class="{ 'is-invalid': errors.Payment_Date }" @input="validateForm" />
-              <div v-if="errors.Payment_Date" class="invalid-feedback">결제일을 선택해주세요.</div>
+              <span class="input-group-text" id="basic-addon1">결제일</span>
+              <select v-model="card.Payment_Date" class="form-select" :class="{ 'is-invalid': errors.Payment_Date }"
+                @input="validateForm">
+                <option v-for="day in 28" :key="day" :value="day">{{ day }}일</option>
+              </select>
             </div>
 
             <!-- 카드 종류 -->
@@ -50,7 +52,8 @@
           <!-- Modal Footer -->
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetForm">닫기</button>
-            <button type="button" class="btn btn-primary" :disabled="hasErrors" data-bs-dismiss="modal" @click="addCard">
+            <button type="button" class="btn btn-primary" :disabled="hasErrors" data-bs-dismiss="modal"
+              @click="addCard">
               완료
             </button>
           </div>
@@ -66,7 +69,7 @@ import { mapActions } from "vuex";
 export default {
   name: "CardForm",
   props: {
-    depositAccount: Object,
+    deposit: Object,
     index: Number,
   },
   data() {
@@ -77,8 +80,8 @@ export default {
         Limit_Amount: 0,
         Payment_Date: "",
         Card_Type: "",
-        Customer_Resident_Registration_Number: this.depositAccount.Customer_Resident_Registration_Number, // 고객 주민등록번호
-        Deposit_Account_ID: this.depositAccount.Deposit_Account_ID,
+        Customer_Resident_Registration_Number: this.deposit.Customer_Resident_Registration_Number, // 고객 주민등록번호
+        Deposit_Account_ID: this.deposit.Deposit_Account_ID,
       },
       errors: {
         Date_Of_Application: false,
@@ -117,8 +120,8 @@ export default {
         Limit_Amount: 0,
         Payment_Date: "",
         Card_Type: "",
-        Customer_Resident_Registration_Number: this.depositAccount.Customer_Resident_Registration_Number, // 고객 주민등록번호
-        Deposit_Account_ID: this.depositAccount.Deposit_Account_ID,
+        Customer_Resident_Registration_Number: this.deposit.Customer_Resident_Registration_Number, // 고객 주민등록번호
+        Deposit_Account_ID: this.deposit.Deposit_Account_ID,
       };
       this.errors = {
         Date_Of_Application: false,

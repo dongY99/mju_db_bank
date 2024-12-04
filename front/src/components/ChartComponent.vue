@@ -19,6 +19,7 @@
               </select>
             </div>
             <CustomerForm />
+            <button type="button" class="btn btn-success mx-3">거래 내역 추가</button>
           </ul>
         </div>
       </div>
@@ -61,6 +62,27 @@ export default {
     DepositAccountPage,
     TransactionPage,
     CardPage,
+  },
+
+  methods: {
+    async addTransaction() {
+      try {
+        let transaction = {
+          'Transaction_Number': Math.floor(Math.random() * 9000) + 1000,
+          'Deposit_Account_ID': //예금계좌 테이블 중 아무 튜플의 ID
+          'Data_Of_Deposit_Withdrawal': //현재 날짜와 시간
+          'Transaction_Amount': Math.floor(Math.random()),
+          'Balance': //해당 계좌의 금액 - 지불금액 만약 0 이하가 된다면 실패 alter
+          'Details_Of_Transaction': //아무글자나 null
+        };
+
+        await this.postTransactions(this.transaction);
+
+        alert("거래 내역이 성공적으로 추가되었습니다.");
+      } catch(error) {
+        console.error("Error adding transaction:", error);
+      }
+    } 
   }
 };
 </script>

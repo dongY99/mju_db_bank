@@ -46,7 +46,7 @@ class Card(db.Model):
     Card_ID = db.Column(db.Integer, primary_key=True, autoincrement=True)
     Date_Of_Application = db.Column(db.Date, nullable=False)
     Limit_Amount = db.Column(db.Float, nullable=False)
-    Payment_Date = db.Column(db.Date, nullable=False)
+    Payment_Date = db.Column(db.Integer, nullable=False)
     Card_Type = db.Column(db.String(50), nullable=False)
     Customer_Resident_Registration_Number = db.Column(db.String(14), db.ForeignKey('customers.Resident_Registration_Number'), nullable=False)
     Deposit_Account_ID = db.Column(db.Integer, db.ForeignKey('deposit_accounts.Deposit_Account_ID'), nullable=False)

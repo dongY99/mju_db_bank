@@ -193,6 +193,7 @@ def add_deposit_account():
         # 클라이언트로부터 JSON 데이터 받기
         data = request.get_json()
 
+
         # 필수 필드 값 추출
         Deposit_Account_ID = data.get("Deposit_Account_ID")
         Account_Type = data.get("Account_Type")
@@ -230,7 +231,7 @@ def add_deposit_account():
             Account_Type=Account_Type,
             Balance=Balance,
             Data_Of_Opening=Data_Of_Opening,
-            Card_Application_Statu=Card_Application_Status,
+            Card_Application_Status=Card_Application_Status,
             Customer_Resident_Registration_Number=Customer_Resident_Registration_Number,
         )
 
