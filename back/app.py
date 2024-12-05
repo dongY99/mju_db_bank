@@ -418,6 +418,128 @@ def add_card():
 
 
 # 쿼리
+@app.route('/query/customer/pk', methods=['GET'])
+def query_customer_by_pk():
+    resident_registration_number = request.args.get('resident_registration_number')
+    query = db.session.query(Customer).filter(Customer.Resident_Registration_Number == resident_registration_number)
+    
+    # 쿼리 출력
+    print(str(query.statement.compile(dialect=db.engine.dialect)))
+
+    result = query.one_or_none()  # 결과가 없으면 None, 있으면 단일 객체 반환
+    if result == None:
+        return jsonify({"customer": []})
+    else:
+        return (
+            jsonify(
+                {
+                    "message": "쿼리 성공.",
+                    "customer": [{
+                        "Resident_Registration_Number": result.Resident_Registration_Number,
+                        "Name": result.Name,
+                        "Address": result.Address,
+                        "Date_Of_Birth": result.Date_Of_Birth,
+                        "Email": result.Email,
+                        "Phone_Number": result.Phone_Number,
+                        "Occupation": result.Occupation,
+                    }],
+                }
+            ),
+            201,
+        )
+
+@app.route('/query/deposit_account/pk', methods=['GET'])
+def query_deposit_account_by_pk():
+    deposit_account_id = request.args.get('deposit_account_id')
+    query = db.session.query(DepositAccount).filter(DepositAccount.Deposit_Account_ID == deposit_account_id)
+    
+    # 쿼리 출력
+    print(str(query.statement.compile(dialect=db.engine.dialect)))
+
+    result = query.one_or_none()  # 결과가 없으면 None 반환
+    if result == None:
+        return jsonify({"deposit_account": []})
+    else:
+        return (
+            jsonify(
+                {
+                    "message": "쿼리 성공.",
+                    "deposit_account": [{
+                        "Deposit_Account_ID": result.Deposit_Account_ID,
+                        "Account_Type": result.Account_Type,
+                        "Balance": result.Balance,
+                        "Data_Of_Opening": result.Data_Of_Opening,
+                        "Card_Application_Status": result.Card_Application_Status,
+                        "Customer_Resident_Registration_Number": result.Customer_Resident_Registration_Number,
+                    }],
+                }
+            ),
+            201,
+        )
+
+@app.route('/query/card/pk', methods=['GET'])
+def query_card_by_pk():
+    card_id = request.args.get('card_id')
+    query = db.session.query(Card).filter(Card.Card_ID == card_id)
+    
+    # 쿼리 출력
+    print(str(query.statement.compile(dialect=db.engine.dialect)))
+
+    result = query.one_or_none()  # 결과가 없으면 None 반환
+    if result == None:
+        return jsonify({"card": []})
+    else:
+        return (
+            jsonify(
+                {
+                    "message": "쿼리 성공.",
+                    "card": [{
+                        "Card_ID": result.Card_ID,
+                        "Card_Type": result.Card_Type,
+                        "Limit_Amount": result.Limit_Amount,
+                        "Payment_Date": result.Payment_Date,
+                        "Date_Of_Application": result.Date_Of_Application,
+                        "Customer_Resident_Registration_Number": result.Customer_Resident_Registration_Number,
+                        "Deposit_Account_ID": result.Deposit_Account_ID,
+                    }],
+                }
+            ),
+            201,
+        )
+    
+@app.route('/query/transaction', methods=['GET'])
+def query_transaction():
+    deposit_account_id = request.args.get('deposit_account_id')
+    query = db.session.query(Transaction).filter(Transaction.Deposit_Account_ID == deposit_account_id)
+    
+    # 쿼리 출력
+    print(str(query.statement.compile(dialect=db.engine.dialect)))
+
+    result = query.all()
+    if result == None:
+        return jsonify({"transactions": []})
+    else:
+        return (
+            jsonify(
+                {
+                    "message": "쿼리 성공.",
+                    "transactions": [{
+                        "Deposit_Account_ID": transaction.Deposit_Account_ID,
+                        "Transaction_Amount": transaction.Transaction_Amount,
+                        "Details_Of_Transaction": transaction.Details_Of_Transaction,
+                        "Data_Of_Deposit_Withdrawal": transaction.Data_Of_Deposit_Withdrawal,
+                        "Balance": transaction.Balance,
+                    } for transaction in result ],
+                }
+            ),
+            201,
+        )
+
+
+
+
+
+
 def query_accounts_by_name(name):
     query = (
         db.session.query(DepositAccount.Deposit_Account_ID, DepositAccount.Balance)

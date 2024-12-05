@@ -122,6 +122,39 @@ const store = createStore({
         throw error;
       }
     },
+
+    async searchCustomer({ commit }, resident_registration_number) {
+      const response = await axios.get('/query/customer/pk', {
+        params: { resident_registration_number: resident_registration_number } // 쿼리 파라미터
+      });
+      console.log(response.data.customer)
+
+      commit("setCustomers", response.data.customer)
+    },
+
+    async searchDepositAccount({ commit }, deposit_account_id) {
+      const response = await axios.get('/query/deposit_account/pk', {
+        params: { deposit_account_id: deposit_account_id } // 쿼리 파라미터
+      });
+
+      commit("setDepositAccount", response.data.deposit_account)
+    },
+
+    async searchCard({ commit }, card_id) {
+      const response = await axios.get('/query/card/pk', {
+        params: { card_id: card_id } // 쿼리 파라미터
+      });
+
+      commit("setCard", response.data.card)
+    },
+
+    async searchTransaction({ commit }, deposit_account_id) {
+      const response = await axios.get('/query/transaction', {
+        params: { deposit_account_id: deposit_account_id } // 쿼리 파라미터
+      });
+
+      commit("setTransactions", response.data.transactions)
+    },
   },
 
   getters: {

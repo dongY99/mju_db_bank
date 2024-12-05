@@ -4,8 +4,9 @@
       <div class="container-fluid">
         <div class="collapse navbar-collapse">
           <ul class="navbar-nav">
-            <form class="d-flex" role="search">
-              <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
+            <form class="d-flex" role="search" @submit.prevent="search">
+              <input v-model="searchWord" class="form-control me-2" type="search" placeholder="Search"
+                aria-label="Search" />
               <button class="btn btn-outline-success" type="submit">
                 Search
               </button>
@@ -18,6 +19,9 @@
                 <option :value=3>카드</option>
               </select>
             </div>
+            <button class="btn btn-primary me-3" @click="refreshPage">
+              <i class="bi bi-arrow-clockwise"></i>
+            </button>
             <CustomerForm />
             <button type="button" class="btn btn-success mx-3" @click="addTransaction">거래 내역 추가</button>
           </ul>
@@ -54,7 +58,8 @@ export default {
   name: 'ChartComponent',
   data() {
     return {
-      searchType: 0
+      searchType: 0,
+      searchWord: ""
     };
   },
 
@@ -67,7 +72,19 @@ export default {
   },
 
   methods: {
-    ...mapActions(["postTransactions", "fetchDepositAccount", "fetchTransaction"]), // Vuex 액션 맵핑
+    ...mapActions(["postTransactions", "fetchCustomers", "fetchCard", "fetchDepositAccount", "fetchTransaction", "searchCustomer", "searchDepositAccount", "searchCard", "searchTransaction"]), // Vuex 액션 맵핑
+
+    async search() {
+      if (this.searchType == 0) {
+        await this.searchCustomer(this.searchWord)
+      } else if (this.searchType == 1) {
+        await this.searchDepositAccount(this.searchWord)
+      } else if (this.searchType == 2) {
+        await this.searchTransaction(this.searchWord)
+      } else if (this.searchType == 3) {
+        await this.searchCard(this.searchWord)
+      }
+    },
 
     async addTransaction() {
       try {
@@ -77,7 +94,7 @@ export default {
           return;
         }
         const randomAccount = depositAccounts[Math.floor(Math.random() * depositAccounts.length)];
-        
+
         const randomAccountID = randomAccount.Deposit_Account_ID;
 
         // 무작위 거래 내역 생성
@@ -105,7 +122,27 @@ export default {
       } catch (error) {
         console.error("Error adding transaction:", error);
       }
-    }
+    },
+
+    async refreshPage() {
+      if (this.searchType == 0) {
+        this.fetchCustomers().then(() => {
+          console.log('customer data load');
+        });
+      } else if (this.searchType == 1) {
+        this.fetchDepositAccount().then(() => {
+          console.log('DepositAccount data load');
+        });
+      } else if (this.searchType == 2) {
+        this.fetchTransaction().then(() => {
+          console.log('Transations data load');
+        });
+      } else if (this.searchType == 3) {
+        this.fetchCard().then(() => {
+          console.log('card data load');
+        });
+      }
+    },
   }
 };
 </script>
