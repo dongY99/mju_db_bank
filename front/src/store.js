@@ -73,7 +73,7 @@ const store = createStore({
       }
     },
 
-    async fetchtransaction({ commit }) {
+    async fetchTransaction({ commit }) {
       try {
         const response = await axios.get('/api/transactions');
 

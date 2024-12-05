@@ -19,7 +19,7 @@
               </select>
             </div>
             <CustomerForm />
-            <button type="button" class="btn btn-success mx-3">거래 내역 추가</button>
+            <button type="button" class="btn btn-success mx-3" @click="addTransaction">거래 내역 추가</button>
           </ul>
         </div>
       </div>
@@ -47,6 +47,8 @@ import CustomersPage from './CustomersPage.vue';
 import DepositAccountPage from './DepositAccountPage.vue';
 import TransactionPage from './TransactionPage.vue';
 import CardPage from './CardPage.vue';
+import { mapActions } from 'vuex';
+import axios from 'axios';
 
 export default {
   name: 'ChartComponent',
@@ -65,24 +67,45 @@ export default {
   },
 
   methods: {
+    ...mapActions(["postTransactions", "fetchDepositAccount", "fetchTransaction"]), // Vuex 액션 맵핑
+
     async addTransaction() {
       try {
+        const depositAccounts = (await axios.get('/api/deposit_account')).data;
+        if (depositAccounts.length === 0) {
+          alert("예금 계좌가 존재하지 않습니다.");
+          return;
+        }
+        const randomAccount = depositAccounts[Math.floor(Math.random() * depositAccounts.length)];
+        
+        const randomAccountID = randomAccount.Deposit_Account_ID;
+
+        // 무작위 거래 내역 생성
+        const transactionAmount = Math.floor(Math.random() * 1000) - 499; // -499~500 사이의 무작위 거래 금액
+        const newBalance = randomAccount.Balance + transactionAmount;
+
+        if (newBalance < 0) {
+          alert("거래 금액이 잔액을 초과합니다. 거래 실패.");
+          return;
+        }
+
         let transaction = {
-          'Transaction_Number': Math.floor(Math.random() * 9000) + 1000,
-          'Deposit_Account_ID': //예금계좌 테이블 중 아무 튜플의 ID
-          'Data_Of_Deposit_Withdrawal': //현재 날짜와 시간
-          'Transaction_Amount': Math.floor(Math.random()),
-          'Balance': //해당 계좌의 금액 - 지불금액 만약 0 이하가 된다면 실패 alter
-          'Details_Of_Transaction': //아무글자나 null
+          Transaction_Number: Math.floor(Math.random() * 9000) + 1000, // 임의의 거래 번호
+          Deposit_Account_ID: randomAccountID, // 선택된 계좌의 ID
+          Data_Of_Deposit_Withdrawal: "", // 현재 날짜와 시간
+          Transaction_Amount: transactionAmount, // 무작위 거래 금액
+          Balance: newBalance, // 계산된 새로운 잔액
+          Details_Of_Transaction: "자동 생성 거래", // 예제 거래 내용
         };
 
-        await this.postTransactions(this.transaction);
+        await this.postTransactions(transaction);
+        await this.fetchDepositAccount();
 
         alert("거래 내역이 성공적으로 추가되었습니다.");
-      } catch(error) {
+      } catch (error) {
         console.error("Error adding transaction:", error);
       }
-    } 
+    }
   }
 };
 </script>

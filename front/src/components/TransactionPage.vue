@@ -25,13 +25,13 @@
       </li>
     </ul>
   </div>
-  <ul v-for="(transation, index) in transations" :key="index" class="list-group list-group-horizontal row">
-    <li class="list-group-item col"> {{ transation.Transaction_Number }}</li>
-    <li class="list-group-item col"> {{ transation.Deposit_Account_ID }}</li>
-    <li class="list-group-item col"> {{ transation.Data_Of_Deposit_Withdrawal }}</li>
-    <li class="list-group-item col"> {{ transation.Transaction_Amount }}</li>
-    <li class="list-group-item col"> {{ transation.Balance }}</li>
-    <li class="list-group-item col"> {{ transation.Details_Of_Transaction }}</li>
+  <ul v-for="(transaction, index) in transactions" :key="index" class="list-group list-group-horizontal row">
+    <li class="list-group-item col"> {{ transaction.Transaction_Number }}</li>
+    <li class="list-group-item col"> {{ transaction.Deposit_Account_ID }}</li>
+    <li class="list-group-item col"> {{ transaction.Data_Of_Deposit_Withdrawal }}</li>
+    <li class="list-group-item col"> {{ transaction.Transaction_Amount }}</li>
+    <li class="list-group-item col"> {{ transaction.Balance }}</li>
+    <li class="list-group-item col"> {{ transaction.Details_Of_Transaction }}</li>
   </ul>
 </template>
 
@@ -47,7 +47,7 @@ export default {
   },
 
   computed: {
-    ...mapState(["transations"]),
+    ...mapState(["transactions"]),
   },
 }
 </script>

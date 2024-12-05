@@ -91,11 +91,7 @@ def get_cards():
                     else None
                 ),
                 "Limit_Amount": card.Limit_Amount,
-                "Payment_Date": (
-                    card.Payment_Date.strftime("%Y-%m-%d")
-                    if card.Payment_Date
-                    else None
-                ),
+                "Payment_Date": card.Payment_Date,
                 "Card_Type": card.Card_Type,
                 "Customer_Resident_Registration_Number": card.Customer_Resident_Registration_Number,
                 "Deposit_Account_ID": card.Deposit_Account_ID,
@@ -107,14 +103,14 @@ def get_cards():
         return jsonify({"error": "Error fetching cards", "details": str(e)}), 500
 
 
-@app.route('/api/transations', methods=['GET'])
+@app.route('/api/transactions', methods=['GET'])
 def get_transactions():
     try:
         transactions = Transaction.query.all()
         transaction_list = [{
             "Transaction_Number": transaction.Transaction_Number,
             "Deposit_Account_ID": transaction.Deposit_Account_ID,
-            "Data_Of_Deposit_Withdrawal": transaction.Data_Of_Deposit_Withdrawal.strftime('%Y-%m-%d %H:%M:%S') if transaction.Data_Of_Deposit_Withdrawal else None,
+            "Data_Of_Deposit_Withdrawal": transaction.Data_Of_Deposit_Withdrawal.strftime('%Y-%m-%d %H:%M:%S'),
             "Transaction_Amount": transaction.Transaction_Amount,
             "Balance": transaction.Balance,
             "Details_Of_Transaction": transaction.Details_Of_Transaction
@@ -272,16 +268,15 @@ def add_transaction():
         Deposit_Account_ID = data.get("Deposit_Account_ID")
         Transaction_Amount = data.get("Transaction_Amount")
         Details_Of_Transaction = data.get("Details_Of_Transaction", "")
-        Data_Of_Deposit_Withdrawal = data.get("Data_Of_Deposit_Withdrawal")
+        Data_Of_Deposit_Withdrawal = datetime.now()
 
         # 필수 필드가 없으면 오류 반환
         if (
             not Deposit_Account_ID
             or not Transaction_Amount
-            or not Data_Of_Deposit_Withdrawal
         ):
             return (
-                jsonify({"error": "출금계좌, 거래금액, 거래날짜는 필수 항목입니다."}),
+                jsonify({"error": "출금계좌, 거래금액는 필수 항목입니다."}),
                 400,
             )
 
@@ -299,7 +294,7 @@ def add_transaction():
             return jsonify({"error": "출금액이 계좌 잔고를 초과할 수 없습니다."}), 400
 
         deposit_account.Balance = new_Balance
-
+        
         # 트랜잭션 객체 생성
         new_transaction = Transaction(
             Deposit_Account_ID=Deposit_Account_ID,

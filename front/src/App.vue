@@ -23,19 +23,22 @@ export default {
     ChartComponent,
   },
   methods: {
-    ...mapActions(['fetchCustomers' , 'fetchDepositAccount', 'fetchCard', 'fetchTransations']), // 액션 호출
+    ...mapActions(['fetchCustomers' , 'fetchDepositAccount', 'fetchCard', 'fetchTransaction']), // 액션 호출
   },
   mounted() {
     this.fetchCustomers().then(() => {
       console.log('customer data load')
-    }); // 앱 시작 시 데이터 로드
+    });
+
     this.fetchDepositAccount().then(() => {
       console.log('DepositAccount data load')
     });
+
     this.fetchCard().then(() => {
       console.log('card data load')
     });
-    this.fetchTransations().then(() => {
+
+    this.fetchTransaction().then(() => {
       console.log('Transations data load')
     });
   },

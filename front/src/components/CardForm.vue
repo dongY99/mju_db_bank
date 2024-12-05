@@ -78,7 +78,7 @@ export default {
         Card_ID: Math.floor(Math.random() * 9000) + 1000, // 임의 ID
         Date_Of_Application: "",
         Limit_Amount: 0,
-        Payment_Date: "",
+        Payment_Date: 0,
         Card_Type: "",
         Customer_Resident_Registration_Number: this.deposit.Customer_Resident_Registration_Number, // 고객 주민등록번호
         Deposit_Account_ID: this.deposit.Deposit_Account_ID,
@@ -118,7 +118,7 @@ export default {
         Card_ID: Math.floor(Math.random() * 9000) + 1000,
         Date_Of_Application: "",
         Limit_Amount: 0,
-        Payment_Date: "",
+        Payment_Date: 0,
         Card_Type: "",
         Customer_Resident_Registration_Number: this.deposit.Customer_Resident_Registration_Number, // 고객 주민등록번호
         Deposit_Account_ID: this.deposit.Deposit_Account_ID,
