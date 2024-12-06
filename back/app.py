@@ -149,7 +149,7 @@ def add_customer():
             Resident_Registration_Number=Resident_Registration_Number,
             Name=Name,
             Address=data.get("Address", None),  # 선택적 필드
-            Date_Of_Birth=Date_Of_Birth.strftime("%Y-%m-%d") if Date_Of_Birth else None,
+            Date_Of_Birth=Date_Of_Birth,
             Email=data.get("Email", None),
             Phone_Number=data.get("Phone_Number", None),
             Occupation=data.get("Occupation", None),
@@ -226,7 +226,7 @@ def add_deposit_account():
             Deposit_Account_ID=Deposit_Account_ID,
             Account_Type=Account_Type,
             Balance=Balance,
-            Data_Of_Opening=Data_Of_Opening.strftime("%Y-%m-%d"),
+            Data_Of_Opening=Data_Of_Opening,
             Card_Application_Status=Card_Application_Status,
             Customer_Resident_Registration_Number=Customer_Resident_Registration_Number,
         )
@@ -244,7 +244,7 @@ def add_deposit_account():
                         "Deposit_Account_ID": Deposit_Account_ID,
                         "Account_Type": Account_Type,
                         "Balance": Balance,
-                        "Data_Of_Opening": Data_Of_Opening.strftime("%Y-%m-%d"),
+                        "Data_Of_Opening": new_account.Data_Of_Opening.strftime("%Y-%m-%d"),
                         "Card_Application_Status": Card_Application_Status,
                         "Customer_Resident_Registration_Number": Customer_Resident_Registration_Number,
                     },
@@ -318,7 +318,7 @@ def add_transaction():
                         "Deposit_Account_ID": Deposit_Account_ID,
                         "Transaction_Amount": Transaction_Amount,
                         "Details_Of_Transaction": Details_Of_Transaction,
-                        "Data_Of_Deposit_Withdrawal": Data_Of_Deposit_Withdrawal.strftime('%Y-%m-%d %H:%M:%S'),
+                        "Data_Of_Deposit_Withdrawal": new_transaction.Data_Of_Deposit_Withdrawal.strftime('%Y-%m-%d %H:%M:%S'),
                         "Balance": new_Balance,
                     },
                 }

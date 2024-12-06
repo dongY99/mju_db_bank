@@ -13,6 +13,9 @@ const store = createStore({
       searchedDepositAccount: "",
       searchedCard: "",
       searchedTransaction: "",
+
+      numCustomer: 0,
+      totalBalance: 0,
     }
   },
 
@@ -22,6 +25,7 @@ const store = createStore({
     },
     addCustomer(state, customer) {
       state.customers.push(customer); // 새 고객 추가
+      state.numCustomer++;
     },
 
     setDepositAccount(state, depositAccount) {
@@ -57,6 +61,16 @@ const store = createStore({
     setsearchedTransaction(state, search) {
       state.searchedTransaction = search;
     },
+
+    setTotalBalance(state, totalBalance) {
+      state.totalBalance = totalBalance
+    },
+    setNumcustomer(state, numCustomer) {
+      state.numCustomer = numCustomer
+    },
+    calcTotalBalance(state, balance) {
+      state.totalBalance += balance
+    }
   },
 
   actions: {
@@ -120,6 +134,7 @@ const store = createStore({
       try {
         const response = await axios.post("/add_deposit_account", depositAccount);
         commit("addDepositAccount", response.data.deposit_account); // Vuex 상태 업데이트
+        commit("calcTotalBalance", response.data.deposit_account.Balance)
         dispatch('fetchDepositAccount')
       } catch (error) {
         console.error("Error posting deposit account:", error);
@@ -142,6 +157,7 @@ const store = createStore({
       try {
         const response = await axios.post("/add_transaction", transactions);
         commit("addTransactions", response.data.transaction); // Vuex 상태 업데이트
+        commit("calcTotalBalance", response.data.transaction.Balance)
         dispatch('fetchTransaction');
       } catch (error) {
         console.error("Error posting transaction:", error);
