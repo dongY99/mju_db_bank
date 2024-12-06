@@ -7,15 +7,15 @@
       <li class="nav-item dropdown col">
         <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false">계좌 종류</a>
         <ul class="dropdown-menu">
-          <li><a class="dropdown-item">오름차순</a></li>
-          <li><a class="dropdown-item">내림차순</a></li>
+          <li><a class="dropdown-item" @click="sortDepositAccountFront('Account_Type', 'asc')">오름차순</a></li>
+          <li><a class="dropdown-item" @click="sortDepositAccountFront('Account_Type', 'desc')">내림차순</a></li>
         </ul>
       </li>
       <li class="nav-item dropdown col">
         <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false">잔고</a>
         <ul class="dropdown-menu">
-          <li><a class="dropdown-item">오름차순</a></li>
-          <li><a class="dropdown-item">내림차순</a></li>
+          <li><a class="dropdown-item" @click="sortDepositAccountFront('Balance', 'asc')">오름차순</a></li>
+          <li><a class="dropdown-item" @click="sortDepositAccountFront('Balance', 'desc')">내림차순</a></li>
         </ul>
       </li>
       <li class="nav-item col">
@@ -24,8 +24,8 @@
       <li class="nav-item dropdown col">
         <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false">계좌 개설일</a>
         <ul class="dropdown-menu">
-          <li><a class="dropdown-item">오름차순</a></li>
-          <li><a class="dropdown-item">내림차순</a></li>
+          <li><a class="dropdown-item" @click="sortDepositAccountFront('Data_Of_Opening', 'asc')">오름차순</a></li>
+          <li><a class="dropdown-item" @click="sortDepositAccountFront('Data_Of_Opening', 'desc')">내림차순</a></li>
         </ul>
       </li>
       <li class="nav-item col">
@@ -47,7 +47,7 @@
 
 <script>
 import CardForm from "./CardForm.vue";
-import { mapState } from "vuex";
+import { mapState, mapActions } from "vuex";
 
 export default {
   name: 'DepositAccountPage',
@@ -64,5 +64,14 @@ export default {
   computed: {
     ...mapState(["depositAccount"]),
   },
+
+  methods: {
+    ...mapActions(["sortDepositAccount"]),
+
+    async sortDepositAccountFront(field, order) {
+      const data = {field, order}
+      await this.sortDepositAccount(data)
+    }
+  }
 }
 </script>

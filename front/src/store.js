@@ -8,6 +8,11 @@ const store = createStore({
       depositAccount: [],
       card: [],
       transactions: [],
+
+      searchedCustomer: "",
+      searchedDepositAccount: "",
+      searchedCard: "",
+      searchedTransaction: "",
     }
   },
 
@@ -38,8 +43,20 @@ const store = createStore({
     },
     addTransactions(state, transaction) {
       state.transactions.push(transaction);
-    }
+    },
 
+    setsearchedCustomer(state, search) {
+      state.searchedCustomer = search;
+    },
+    setsearchedDepositAccount(state, search) {
+      state.searchedDepositAccount = search;
+    },
+    setsearchedCard(state, search) {
+      state.searchedCard = search;
+    },
+    setsearchedTransaction(state, search) {
+      state.searchedTransaction = search;
+    },
   },
 
   actions: {
@@ -48,6 +65,7 @@ const store = createStore({
         const response = await axios.get('/api/customers');
 
         commit('setCustomers', response.data);
+        commit('setsearchedCustomer', "");
       } catch (error) {
         console.error('fetch customers fail: ', error);
       }
@@ -58,6 +76,7 @@ const store = createStore({
         const response = await axios.get('/api/deposit_account');
 
         commit('setDepositAccount', response.data);
+        commit('setsearchedDepositAccount', "");
       } catch (error) {
         console.error('fetch depositAccount fail: ', error);
       }
@@ -68,6 +87,7 @@ const store = createStore({
         const response = await axios.get('/api/card');
 
         commit('setCard', response.data);
+        commit('setsearchedCard', "");
       } catch (error) {
         console.error('fetch card fail: ', error);
       }
@@ -78,45 +98,51 @@ const store = createStore({
         const response = await axios.get('/api/transactions');
 
         commit('setTransactions', response.data);
+        commit('setsearchedTransaction', "");
       } catch (error) {
         console.error('fetch transaction fail: ', error);
       }
     },
 
-    async postCustomer({ commit }, customer) {
+    async postCustomer({ commit, dispatch }, customer) {
       try {
         const response = await axios.post('/add_customer', customer);
         commit('addCustomer', response.data.customer); // Store에 새 고객 추가
+        dispatch('fetchCustomers')
+
       } catch (error) {
         console.error('Error posting customer:', error);
         throw error; // Vue 컴포넌트에서 에러를 처리하도록 전달
       }
     },
 
-    async postDepositAccount({ commit }, depositAccount) {
+    async postDepositAccount({ commit, dispatch }, depositAccount) {
       try {
         const response = await axios.post("/add_deposit_account", depositAccount);
         commit("addDepositAccount", response.data.deposit_account); // Vuex 상태 업데이트
+        dispatch('fetchDepositAccount')
       } catch (error) {
         console.error("Error posting deposit account:", error);
         throw error;
       }
     },
 
-    async postCard({ commit }, card) {
+    async postCard({ commit, dispatch }, card) {
       try {
         const response = await axios.post("/add_card", card);
         commit("addCard", response.data.card); // Vuex 상태 업데이트
+        dispatch('fetchCard')
       } catch (error) {
         console.error("Error posting card:", error);
         throw error;
       }
     },
 
-    async postTransactions({ commit }, transactions) {
+    async postTransactions({ commit, dispatch }, transactions) {
       try {
         const response = await axios.post("/add_transaction", transactions);
         commit("addTransactions", response.data.transaction); // Vuex 상태 업데이트
+        dispatch('fetchTransaction');
       } catch (error) {
         console.error("Error posting transaction:", error);
         throw error;
@@ -127,9 +153,9 @@ const store = createStore({
       const response = await axios.get('/query/customer/pk', {
         params: { resident_registration_number: resident_registration_number } // 쿼리 파라미터
       });
-      console.log(response.data.customer)
 
-      commit("setCustomers", response.data.customer)
+      commit("setCustomers", response.data.customer);
+      commit('setsearchedCustomer', resident_registration_number);
     },
 
     async searchDepositAccount({ commit }, deposit_account_id) {
@@ -138,6 +164,7 @@ const store = createStore({
       });
 
       commit("setDepositAccount", response.data.deposit_account)
+      commit('setsearchedDepositAccount', deposit_account_id);
     },
 
     async searchCard({ commit }, card_id) {
@@ -146,6 +173,7 @@ const store = createStore({
       });
 
       commit("setCard", response.data.card)
+      commit('setsearchedCard', card_id);
     },
 
     async searchTransaction({ commit }, deposit_account_id) {
@@ -154,6 +182,39 @@ const store = createStore({
       });
 
       commit("setTransactions", response.data.transactions)
+      commit('setsearchedTransaction', deposit_account_id);
+    },
+
+    async sortCustomer({ state, commit }, data) {
+      const response = await axios.get('/query/customers/sorted', {
+        params: { field: data.field, order: data.order, resident_registration_number: state.searchedCustomer }
+      });
+
+      commit("setCustomers", response.data.customers)
+    },
+
+    async sortDepositAccount({ state, commit }, data) {
+      const response = await axios.get('/query/deposit_accounts/sorted', {
+        params: { field: data.field, order: data.order, deposit_account_id: state.searchedDepositAccount }
+      });
+
+      commit("setDepositAccount", response.data.deposit_accounts)
+    },
+
+    async sortTransaction({ state, commit }, data) {
+      const response = await axios.get('/query/transactions/sorted', {
+        params: { field: data.field, order: data.order, deposit_account_id: state.searchedTransaction }
+      });
+
+      commit("setTransactions", response.data.transactions)
+    },
+
+    async sortCard({ state, commit }, data) {
+      const response = await axios.get('/query/card/sorted', {
+        params: { field: data.field, order: data.order, card_id: state.searchedCard }
+      });
+
+      commit("setCard", response.data.cards)
     },
   },
 

@@ -7,15 +7,15 @@
       <li class="nav-item dropdown col">
         <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false">신청일</a>
         <ul class="dropdown-menu">
-          <li><a class="dropdown-item">오름차순</a></li>
-          <li><a class="dropdown-item">내림차순</a></li>
+          <li><a class="dropdown-item" @click="sortCardFront('Date_Of_Application', 'asc')">오름차순</a></li>
+          <li><a class="dropdown-item" @click="sortCardFront('Date_Of_Application', 'desc')">내림차순</a></li>
         </ul>
       </li>
       <li class="nav-item dropdown col">
         <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false">한도 금액</a>
         <ul class="dropdown-menu">
-          <li><a class="dropdown-item">오름차순</a></li>
-          <li><a class="dropdown-item">내림차순</a></li>
+          <li><a class="dropdown-item" @click="sortCardFront('Limit_Amount', 'asc')">오름차순</a></li>
+          <li><a class="dropdown-item" @click="sortCardFront('Limit_Amount', 'desc')">내림차순</a></li>
         </ul>
       </li>
       <li class="nav-item col">
@@ -24,8 +24,8 @@
       <li class="nav-item dropdown col">
         <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false">카드 종류</a>
         <ul class="dropdown-menu">
-          <li><a class="dropdown-item">오름차순</a></li>
-          <li><a class="dropdown-item">내림차순</a></li>
+          <li><a class="dropdown-item" @click="sortCardFront('Card_Type', 'asc')">오름차순</a></li>
+          <li><a class="dropdown-item" @click="sortCardFront('Card_Type', 'desc')">내림차순</a></li>
         </ul>
       </li>
       <li class="nav-item col">
@@ -48,7 +48,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState, mapActions } from "vuex";
 
 export default {
   name: 'CardPage',
@@ -61,5 +61,14 @@ export default {
   computed: {
     ...mapState(["card"]),
   },
+
+  methods: {
+    ...mapActions(["sortCard"]),
+
+    async sortCardFront(field, order) {
+      const data = {field, order}
+      await this.sortCard(data)
+    }
+  }
 }
 </script>

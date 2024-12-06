@@ -7,15 +7,15 @@
       <li class="nav-item dropdown col">
         <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false">이름</a>
         <ul class="dropdown-menu">
-          <li><a class="dropdown-item">오름차순</a></li>
-          <li><a class="dropdown-item">내림차순</a></li>
+          <li><a class="dropdown-item" @click="sortCustomerFront('Name', 'asc')">오름차순</a></li>
+          <li><a class="dropdown-item" @click="sortCustomerFront('Name', 'desc')">내림차순</a></li>
         </ul>
       </li>
       <li class="nav-item dropdown col">
         <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false">주소</a>
         <ul class="dropdown-menu">
-          <li><a class="dropdown-item">오름차순</a></li>
-          <li><a class="dropdown-item">내림차순</a></li>
+          <li><a class="dropdown-item" @click="sortCustomerFront('Address', 'asc')">오름차순</a></li>
+          <li><a class="dropdown-item" @click="sortCustomerFront('Address', 'desc')">내림차순</a></li>
         </ul>
       </li>
       <li class="nav-item col">
@@ -46,14 +46,14 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState, mapActions } from "vuex";
 import DepositAccountForm from "./DepositAccountForm.vue";
 
 export default {
   name: 'CustomersPage',
   data() {
     return {
-
+      
     }
   },
   components: {
@@ -63,5 +63,14 @@ export default {
   computed: {
     ...mapState(["customers"]),
   },
+
+  methods: {
+    ...mapActions(["sortCustomer"]),
+
+    async sortCustomerFront(field, order) {
+      const data = {field, order};
+      await this.sortCustomer(data);
+    }
+  }
 }
 </script>
