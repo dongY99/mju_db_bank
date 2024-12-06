@@ -12,6 +12,7 @@
         <ul class="dropdown-menu">
           <li><a class="dropdown-item" @click="sortTransactionFront('Data_Of_Deposit_Withdrawal', 'asc')">오름차순</a></li>
           <li><a class="dropdown-item" @click="sortTransactionFront('Data_Of_Deposit_Withdrawal', 'desc')">내림차순</a></li>
+          <li><a class="dropdown-item" @click="queryTransactionsLastMonthFront">최근 한달</a></li>
         </ul>
       </li>
       <li class="nav-item col">
@@ -51,11 +52,15 @@ export default {
   },
 
   methods: {
-    ...mapActions(["sortTransaction"]),
+    ...mapActions(["sortTransaction", "queryTransactionsLastMonth"]),
 
     async sortTransactionFront(field, order) {
       const data = {field, order}
       await this.sortTransaction(data)
+    },
+
+    async queryTransactionsLastMonthFront() {
+      await this.queryTransactionsLastMonth();
     }
   }
 }

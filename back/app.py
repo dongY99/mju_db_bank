@@ -31,7 +31,10 @@ def index():
 @app.route("/api/customers", methods=["GET"])
 def getCutomers():
     try:
-        customers = Customer.query.all()
+        query = db.session.query(Customer)
+        print(str(query.statement.compile(dialect=db.engine.dialect)))  # 쿼리 출력
+        customers = query.all()
+
         customer_list = [
             {
                 "Resident_Registration_Number": c.Resident_Registration_Number,
@@ -54,7 +57,10 @@ def getCutomers():
 @app.route("/api/deposit_account", methods=["GET"])
 def get_deposit_accounts():
     try:
-        deposit_accounts = DepositAccount.query.all()
+        query = db.session.query(DepositAccount)
+        print(str(query.statement.compile(dialect=db.engine.dialect)))  # 쿼리 출력
+        deposit_accounts = query.all()
+
         account_list = [
             {
                 "Deposit_Account_ID": account.Deposit_Account_ID,
@@ -81,7 +87,10 @@ def get_deposit_accounts():
 @app.route("/api/card", methods=["GET"])
 def get_cards():
     try:
-        cards = Card.query.all()
+        query = db.session.query(Card)
+        print(str(query.statement.compile(dialect=db.engine.dialect)))  # 쿼리 출력
+        cards = query.all()
+
         card_list = [
             {
                 "Card_ID": card.Card_ID,
@@ -103,25 +112,33 @@ def get_cards():
         return jsonify({"error": "Error fetching cards", "details": str(e)}), 500
 
 
-@app.route('/api/transactions', methods=['GET'])
+@app.route("/api/transactions", methods=["GET"])
 def get_transactions():
     try:
-        transactions = Transaction.query.all()
-        transaction_list = [{
-            "Transaction_Number": transaction.Transaction_Number,
-            "Deposit_Account_ID": transaction.Deposit_Account_ID,
-            "Data_Of_Deposit_Withdrawal": transaction.Data_Of_Deposit_Withdrawal.strftime('%Y-%m-%d %H:%M:%S'),
-            "Transaction_Amount": transaction.Transaction_Amount,
-            "Balance": transaction.Balance,
-            "Details_Of_Transaction": transaction.Details_Of_Transaction
-        } for transaction in transactions]
+        query = db.session.query(Transaction)
+        print(str(query.statement.compile(dialect=db.engine.dialect)))  # 쿼리 출력
+        transactions = query.all()
+
+        transaction_list = [
+            {
+                "Transaction_Number": transaction.Transaction_Number,
+                "Deposit_Account_ID": transaction.Deposit_Account_ID,
+                "Data_Of_Deposit_Withdrawal": transaction.Data_Of_Deposit_Withdrawal.strftime(
+                    "%Y-%m-%d %H:%M:%S"
+                ),
+                "Transaction_Amount": transaction.Transaction_Amount,
+                "Balance": transaction.Balance,
+                "Details_Of_Transaction": transaction.Details_Of_Transaction,
+            }
+            for transaction in transactions
+        ]
         return jsonify(transaction_list), 200
     except Exception as e:
         return jsonify({"error": "Error fetching transactions", "details": str(e)}), 500
 
 
 # post, db 삽입
-@app.route('/add_customer', methods=['POST'])
+@app.route("/add_customer", methods=["POST"])
 def add_customer():
     try:
         # 클라이언트로부터 JSON 데이터 받기
@@ -159,6 +176,8 @@ def add_customer():
         db.session.add(new_customer)
         db.session.commit()  # 커밋하여 데이터 저장
 
+        print(str(db.session.query(Customer).filter(Customer.Resident_Registration_Number == Resident_Registration_Number).statement.compile(dialect=db.engine.dialect)))
+
         # 성공 메시지 반환
         return (
             jsonify(
@@ -168,7 +187,11 @@ def add_customer():
                         "Resident_Registration_Number": Resident_Registration_Number,
                         "Name": Name,
                         "Address": new_customer.Address,
-                        "Date_Of_Birth": new_customer.Date_Of_Birth.strftime("%Y-%m-%d") if new_customer.Date_Of_Birth else None,
+                        "Date_Of_Birth": (
+                            new_customer.Date_Of_Birth.strftime("%Y-%m-%d")
+                            if new_customer.Date_Of_Birth
+                            else None
+                        ),
                         "Email": new_customer.Email,
                         "Phone_Number": new_customer.Phone_Number,
                         "Occupation": new_customer.Occupation,
@@ -183,12 +206,12 @@ def add_customer():
         db.session.rollback()  # 오류 발생 시 롤백
         return jsonify({"error": "고객 추가 중 오류 발생", "details": str(e)}), 500
 
-@app.route('/add_deposit_account', methods=['POST'])
+
+@app.route("/add_deposit_account", methods=["POST"])
 def add_deposit_account():
     try:
         # 클라이언트로부터 JSON 데이터 받기
         data = request.get_json()
-
 
         # 필수 필드 값 추출
         Deposit_Account_ID = data.get("Deposit_Account_ID")
@@ -235,6 +258,8 @@ def add_deposit_account():
         db.session.add(new_account)
         db.session.commit()  # 커밋하여 데이터 저장
 
+        print(str(db.session.query(DepositAccount).filter(DepositAccount.Deposit_Account_ID == Deposit_Account_ID).statement.compile(dialect=db.engine.dialect)))
+
         # 성공 메시지 반환
         return (
             jsonify(
@@ -244,7 +269,9 @@ def add_deposit_account():
                         "Deposit_Account_ID": Deposit_Account_ID,
                         "Account_Type": Account_Type,
                         "Balance": Balance,
-                        "Data_Of_Opening": new_account.Data_Of_Opening.strftime("%Y-%m-%d"),
+                        "Data_Of_Opening": new_account.Data_Of_Opening.strftime(
+                            "%Y-%m-%d"
+                        ),
                         "Card_Application_Status": Card_Application_Status,
                         "Customer_Resident_Registration_Number": Customer_Resident_Registration_Number,
                     },
@@ -258,7 +285,8 @@ def add_deposit_account():
         db.session.rollback()  # 오류 발생 시 롤백
         return jsonify({"error": "예금계좌 추가 중 오류 발생", "details": str(e)}), 500
 
-@app.route('/add_transaction', methods=['POST'])
+
+@app.route("/add_transaction", methods=["POST"])
 def add_transaction():
     try:
         # 클라이언트로부터 JSON 데이터 받기
@@ -271,10 +299,7 @@ def add_transaction():
         Data_Of_Deposit_Withdrawal = datetime.now()
 
         # 필수 필드가 없으면 오류 반환
-        if (
-            not Deposit_Account_ID
-            or not Transaction_Amount
-        ):
+        if not Deposit_Account_ID or not Transaction_Amount:
             return (
                 jsonify({"error": "출금계좌, 거래금액는 필수 항목입니다."}),
                 400,
@@ -294,7 +319,7 @@ def add_transaction():
             return jsonify({"error": "출금액이 계좌 잔고를 초과할 수 없습니다."}), 400
 
         deposit_account.Balance = new_Balance
-        
+
         # 트랜잭션 객체 생성
         new_transaction = Transaction(
             Deposit_Account_ID=Deposit_Account_ID,
@@ -308,6 +333,8 @@ def add_transaction():
         db.session.add(new_transaction)
         db.session.commit()  # 커밋하여 트랜잭션 데이터 저장
 
+        print(str(db.session.query(Transaction).filter(Transaction.Deposit_Account_ID == Deposit_Account_ID).statement.compile(dialect=db.engine.dialect)))
+
         # 성공 메시지 반환
         return (
             jsonify(
@@ -318,7 +345,9 @@ def add_transaction():
                         "Deposit_Account_ID": Deposit_Account_ID,
                         "Transaction_Amount": Transaction_Amount,
                         "Details_Of_Transaction": Details_Of_Transaction,
-                        "Data_Of_Deposit_Withdrawal": new_transaction.Data_Of_Deposit_Withdrawal.strftime('%Y-%m-%d %H:%M:%S'),
+                        "Data_Of_Deposit_Withdrawal": new_transaction.Data_Of_Deposit_Withdrawal.strftime(
+                            "%Y-%m-%d %H:%M:%S"
+                        ),
                         "Balance": new_Balance,
                     },
                 }
@@ -331,7 +360,8 @@ def add_transaction():
         db.session.rollback()  # 오류 발생 시 롤백
         return jsonify({"error": "트랜잭션 추가 중 오류 발생", "details": str(e)}), 500
 
-@app.route('/add_card', methods=['POST'])
+
+@app.route("/add_card", methods=["POST"])
 def add_card():
     try:
         # 클라이언트로부터 JSON 데이터 받기
@@ -392,7 +422,7 @@ def add_card():
         # 데이터베이스에 추가
         db.session.add(new_card)
         db.session.commit()  # 커밋하여 데이터 저장
-
+        print(str(db.session.query(Card).filter(Card.Card_ID == Card_ID).statement.compile(dialect=db.engine.dialect)))
         # 성공 메시지 반환
         return (
             jsonify(
@@ -419,11 +449,13 @@ def add_card():
 
 
 # 쿼리
-@app.route('/query/customer/pk', methods=['GET'])
+@app.route("/query/customer/pk", methods=["GET"])
 def query_customer_by_pk():
-    resident_registration_number = request.args.get('resident_registration_number')
-    query = db.session.query(Customer).filter(Customer.Resident_Registration_Number == resident_registration_number)
-    
+    resident_registration_number = request.args.get("resident_registration_number")
+    query = db.session.query(Customer).filter(
+        Customer.Resident_Registration_Number == resident_registration_number
+    )
+
     # 쿼리 출력
     print(str(query.statement.compile(dialect=db.engine.dialect)))
 
@@ -435,29 +467,39 @@ def query_customer_by_pk():
             jsonify(
                 {
                     "message": "쿼리 성공.",
-                    "customer": [{
-                        "Resident_Registration_Number": result.Resident_Registration_Number,
-                        "Name": result.Name,
-                        "Address": result.Address,
-                        "Date_Of_Birth": result.Date_Of_Birth.strftime("%Y-%m-%d") if result.Date_Of_Birth else None,
-                        "Email": result.Email,
-                        "Phone_Number": result.Phone_Number,
-                        "Occupation": result.Occupation,
-                    }],
+                    "customer": [
+                        {
+                            "Resident_Registration_Number": result.Resident_Registration_Number,
+                            "Name": result.Name,
+                            "Address": result.Address,
+                            "Date_Of_Birth": (
+                                result.Date_Of_Birth.strftime("%Y-%m-%d")
+                                if result.Date_Of_Birth
+                                else None
+                            ),
+                            "Email": result.Email,
+                            "Phone_Number": result.Phone_Number,
+                            "Occupation": result.Occupation,
+                        }
+                    ],
                 }
             ),
             201,
         )
 
-@app.route('/query/deposit_account/pk', methods=['GET'])
+
+@app.route("/query/deposit_account/pk", methods=["GET"])
 def query_deposit_account_by_pk():
-    deposit_account_id = request.args.get('deposit_account_id')
-    query = db.session.query(DepositAccount).filter(DepositAccount.Deposit_Account_ID == deposit_account_id)
-    
+    resident_registration_number = request.args.get("resident_registration_number")
+    query = db.session.query(DepositAccount).filter(
+        DepositAccount.Customer_Resident_Registration_Number
+        == resident_registration_number
+    )
+
     # 쿼리 출력
     print(str(query.statement.compile(dialect=db.engine.dialect)))
 
-    result = query.one_or_none()  # 결과가 없으면 None 반환
+    result = query.all()  # 결과가 없으면 None 반환
     if result == None:
         return jsonify({"deposit_account": []})
     else:
@@ -465,24 +507,30 @@ def query_deposit_account_by_pk():
             jsonify(
                 {
                     "message": "쿼리 성공.",
-                    "deposit_account": [{
-                        "Deposit_Account_ID": result.Deposit_Account_ID,
-                        "Account_Type": result.Account_Type,
-                        "Balance": result.Balance,
-                        "Data_Of_Opening": result.Data_Of_Opening.strftime("%Y-%m-%d"),
-                        "Card_Application_Status": result.Card_Application_Status,
-                        "Customer_Resident_Registration_Number": result.Customer_Resident_Registration_Number,
-                    }],
+                    "deposit_account": [
+                        {
+                            "Deposit_Account_ID": depositAccount.Deposit_Account_ID,
+                            "Account_Type": depositAccount.Account_Type,
+                            "Balance": depositAccount.Balance,
+                            "Data_Of_Opening": depositAccount.Data_Of_Opening.strftime(
+                                "%Y-%m-%d"
+                            ),
+                            "Card_Application_Status": depositAccount.Card_Application_Status,
+                            "Customer_Resident_Registration_Number": depositAccount.Customer_Resident_Registration_Number,
+                        }
+                        for depositAccount in result
+                    ],
                 }
             ),
             201,
         )
 
-@app.route('/query/card/pk', methods=['GET'])
+
+@app.route("/query/card/pk", methods=["GET"])
 def query_card_by_pk():
-    card_id = request.args.get('card_id')
+    card_id = request.args.get("card_id")
     query = db.session.query(Card).filter(Card.Card_ID == card_id)
-    
+
     # 쿼리 출력
     print(str(query.statement.compile(dialect=db.engine.dialect)))
 
@@ -494,25 +542,32 @@ def query_card_by_pk():
             jsonify(
                 {
                     "message": "쿼리 성공.",
-                    "card": [{
-                        "Card_ID": result.Card_ID,
-                        "Card_Type": result.Card_Type,
-                        "Limit_Amount": result.Limit_Amount,
-                        "Payment_Date": result.Payment_Date,
-                        "Date_Of_Application": result.Date_Of_Application.strftime("%Y-%m-%d"),
-                        "Customer_Resident_Registration_Number": result.Customer_Resident_Registration_Number,
-                        "Deposit_Account_ID": result.Deposit_Account_ID,
-                    }],
+                    "card": [
+                        {
+                            "Card_ID": result.Card_ID,
+                            "Card_Type": result.Card_Type,
+                            "Limit_Amount": result.Limit_Amount,
+                            "Payment_Date": result.Payment_Date,
+                            "Date_Of_Application": result.Date_Of_Application.strftime(
+                                "%Y-%m-%d"
+                            ),
+                            "Customer_Resident_Registration_Number": result.Customer_Resident_Registration_Number,
+                            "Deposit_Account_ID": result.Deposit_Account_ID,
+                        }
+                    ],
                 }
             ),
             201,
         )
-    
-@app.route('/query/transaction', methods=['GET'])
+
+
+@app.route("/query/transaction", methods=["GET"])
 def query_transaction():
-    deposit_account_id = request.args.get('deposit_account_id')
-    query = db.session.query(Transaction).filter(Transaction.Deposit_Account_ID == deposit_account_id)
-    
+    deposit_account_id = request.args.get("deposit_account_id")
+    query = db.session.query(Transaction).filter(
+        Transaction.Deposit_Account_ID == deposit_account_id
+    )
+
     # 쿼리 출력
     print(str(query.statement.compile(dialect=db.engine.dialect)))
 
@@ -524,45 +579,69 @@ def query_transaction():
             jsonify(
                 {
                     "message": "쿼리 성공.",
-                    "transactions": [{
-                        "Transaction_Number": transaction.Transaction_Number,
-                        "Deposit_Account_ID": transaction.Deposit_Account_ID,
-                        "Transaction_Amount": transaction.Transaction_Amount,
-                        "Details_Of_Transaction": transaction.Details_Of_Transaction,
-                        "Data_Of_Deposit_Withdrawal": transaction.Data_Of_Deposit_Withdrawal.strftime('%Y-%m-%d %H:%M:%S'),
-                        "Balance": transaction.Balance,
-                    } for transaction in result ],
+                    "transactions": [
+                        {
+                            "Transaction_Number": transaction.Transaction_Number,
+                            "Deposit_Account_ID": transaction.Deposit_Account_ID,
+                            "Transaction_Amount": transaction.Transaction_Amount,
+                            "Details_Of_Transaction": transaction.Details_Of_Transaction,
+                            "Data_Of_Deposit_Withdrawal": transaction.Data_Of_Deposit_Withdrawal.strftime(
+                                "%Y-%m-%d %H:%M:%S"
+                            ),
+                            "Balance": transaction.Balance,
+                        }
+                        for transaction in result
+                    ],
                 }
             ),
             201,
         )
 
-@app.route('/query/customers/sorted', methods=['GET'])
+
+@app.route("/query/customers/sorted", methods=["GET"])
 def query_customers_sorted():
     # 정렬 기준 및 방향 받기
-    sort_field = request.args.get('field', 'Name')  # 기본 필드는 Name
-    sort_order = request.args.get('order', 'asc')  # 기본 정렬은 오름차순
-    resident_registration_number = request.args.get('resident_registration_number')
+    sort_field = request.args.get("field", "Name")  # 기본 필드는 Name
+    sort_order = request.args.get("order", "asc")  # 기본 정렬은 오름차순
+    resident_registration_number = request.args.get("resident_registration_number")
 
-    query = db.session.query(Customer).filter(Customer.Resident_Registration_Number == resident_registration_number)
+    query = db.session.query(Customer).filter(
+        Customer.Resident_Registration_Number == resident_registration_number
+    )
 
     # 지원하는 정렬 필드와 유효성 검사
-    valid_fields = ['Name', 'Address']
+    valid_fields = ["Name", "Address"]
     if sort_field not in valid_fields:
-        return jsonify({"error": "Invalid sort field. Allowed fields are 'Name' or 'Address'"}), 400
+        return (
+            jsonify(
+                {"error": "Invalid sort field. Allowed fields are 'Name' or 'Address'"}
+            ),
+            400,
+        )
 
     # 정렬 방향 설정
-    if sort_order == 'desc':
+    if sort_order == "desc":
         order_clause = db.desc(getattr(Customer, sort_field))
-    elif sort_order == 'asc':
+    elif sort_order == "asc":
         order_clause = getattr(Customer, sort_field)
     else:
-        return jsonify({"error": "Invalid sort order. Allowed orders are 'asc' or 'desc'"}), 400
+        return (
+            jsonify(
+                {"error": "Invalid sort order. Allowed orders are 'asc' or 'desc'"}
+            ),
+            400,
+        )
     print(sort_order)
 
     # 쿼리 생성
     if resident_registration_number:
-        query = db.session.query(Customer).filter(Customer.Resident_Registration_Number == resident_registration_number).order_by(order_clause)
+        query = (
+            db.session.query(Customer)
+            .filter(
+                Customer.Resident_Registration_Number == resident_registration_number
+            )
+            .order_by(order_clause)
+        )
     else:
         query = db.session.query(Customer).order_by(order_clause)
 
@@ -574,44 +653,73 @@ def query_customers_sorted():
 
     # 결과 반환
     return (
-        jsonify({
-            "message": "쿼리 성공.",
-            "customers": [{
-                "Resident_Registration_Number": customer.Resident_Registration_Number,
-                "Name": customer.Name,
-                "Address": customer.Address,
-                "Date_Of_Birth": customer.Date_Of_Birth.strftime("%Y-%m-%d") if customer.Date_Of_Birth else None,
-                "Email": customer.Email,
-                "Phone_Number": customer.Phone_Number,
-                "Occupation": customer.Occupation,
-            } for customer in result]
-        }),
+        jsonify(
+            {
+                "message": "쿼리 성공.",
+                "customers": [
+                    {
+                        "Resident_Registration_Number": customer.Resident_Registration_Number,
+                        "Name": customer.Name,
+                        "Address": customer.Address,
+                        "Date_Of_Birth": (
+                            customer.Date_Of_Birth.strftime("%Y-%m-%d")
+                            if customer.Date_Of_Birth
+                            else None
+                        ),
+                        "Email": customer.Email,
+                        "Phone_Number": customer.Phone_Number,
+                        "Occupation": customer.Occupation,
+                    }
+                    for customer in result
+                ],
+            }
+        ),
         200,
     )
 
-@app.route('/query/deposit_accounts/sorted', methods=['GET'])
+
+@app.route("/query/deposit_accounts/sorted", methods=["GET"])
 def query_deposit_accounts_sorted():
     # 정렬 기준 및 방향 받기
-    sort_field = request.args.get('field', 'Account_Type')  # 기본 필드는 Account_Type
-    sort_order = request.args.get('order', 'asc')          # 기본 정렬은 오름차순
-    deposit_account_id = request.args.get('deposit_account_id')
+    sort_field = request.args.get("field", "Account_Type")  # 기본 필드는 Account_Type
+    sort_order = request.args.get("order", "asc")  # 기본 정렬은 오름차순
+    resident_registration_number = request.args.get("resident_registration_number")
 
     # 지원하는 정렬 필드와 유효성 검사
-    valid_fields = ['Account_Type', 'Balance', 'Data_Of_Opening']
+    valid_fields = ["Account_Type", "Balance", "Data_Of_Opening"]
     if sort_field not in valid_fields:
-        return jsonify({"error": f"Invalid sort field. Allowed fields are {', '.join(valid_fields)}"}), 400
+        return (
+            jsonify(
+                {
+                    "error": f"Invalid sort field. Allowed fields are {', '.join(valid_fields)}"
+                }
+            ),
+            400,
+        )
 
     # 정렬 방향 설정
-    if sort_order == 'desc':
+    if sort_order == "desc":
         order_clause = db.desc(getattr(DepositAccount, sort_field))
-    elif sort_order == 'asc':
+    elif sort_order == "asc":
         order_clause = getattr(DepositAccount, sort_field)
     else:
-        return jsonify({"error": "Invalid sort order. Allowed orders are 'asc' or 'desc'"}), 400
+        return (
+            jsonify(
+                {"error": "Invalid sort order. Allowed orders are 'asc' or 'desc'"}
+            ),
+            400,
+        )
 
     # 쿼리 생성
-    if deposit_account_id:
-        query = db.session.query(DepositAccount).filter(DepositAccount.Deposit_Account_ID == deposit_account_id).order_by(order_clause)
+    if resident_registration_number:
+        query = (
+            db.session.query(DepositAccount)
+            .filter(
+                DepositAccount.Customer_Resident_Registration_Number
+                == resident_registration_number
+            )
+            .order_by(order_clause)
+        )
     else:
         query = db.session.query(DepositAccount).order_by(order_clause)
 
@@ -623,44 +731,68 @@ def query_deposit_accounts_sorted():
 
     # 결과 반환
     return (
-        jsonify({
-            "message": "쿼리 성공.",
-            "deposit_accounts": [{
-                "Deposit_Account_ID": account.Deposit_Account_ID,
-                "Account_Type": account.Account_Type,
-                "Balance": account.Balance,
-                "Data_Of_Opening": account.Data_Of_Opening.strftime("%Y-%m-%d"),
-                "Card_Application_Status": account.Card_Application_Status,
-                "Customer_Resident_Registration_Number": account.Customer_Resident_Registration_Number,
-            } for account in result]
-        }),
+        jsonify(
+            {
+                "message": "쿼리 성공.",
+                "deposit_accounts": [
+                    {
+                        "Deposit_Account_ID": account.Deposit_Account_ID,
+                        "Account_Type": account.Account_Type,
+                        "Balance": account.Balance,
+                        "Data_Of_Opening": account.Data_Of_Opening.strftime("%Y-%m-%d"),
+                        "Card_Application_Status": account.Card_Application_Status,
+                        "Customer_Resident_Registration_Number": account.Customer_Resident_Registration_Number,
+                    }
+                    for account in result
+                ],
+            }
+        ),
         200,
     )
 
-@app.route('/query/transactions/sorted', methods=['GET'])
+
+@app.route("/query/transactions/sorted", methods=["GET"])
 def query_transactions_sorted():
     # 정렬 기준 및 방향 받기
-    sort_field = request.args.get('field', 'Data_Of_Deposit_Withdrawal')  # 기본 필드는 Data_Of_Deposit_Withdrawal
-    sort_order = request.args.get('order', 'asc')                        # 기본 정렬은 오름차순
-    deposit_account_id = request.args.get('deposit_account_id')
+    sort_field = request.args.get(
+        "field", "Data_Of_Deposit_Withdrawal"
+    )  # 기본 필드는 Data_Of_Deposit_Withdrawal
+    sort_order = request.args.get("order", "asc")  # 기본 정렬은 오름차순
+    deposit_account_id = request.args.get("deposit_account_id")
     print(deposit_account_id)
-    
+
     # 지원하는 정렬 필드와 유효성 검사
-    valid_fields = ['Data_Of_Deposit_Withdrawal']
+    valid_fields = ["Data_Of_Deposit_Withdrawal"]
     if sort_field not in valid_fields:
-        return jsonify({"error": f"Invalid sort field. Allowed fields are {', '.join(valid_fields)}"}), 400
+        return (
+            jsonify(
+                {
+                    "error": f"Invalid sort field. Allowed fields are {', '.join(valid_fields)}"
+                }
+            ),
+            400,
+        )
 
     # 정렬 방향 설정
-    if sort_order == 'desc':
+    if sort_order == "desc":
         order_clause = db.desc(getattr(Transaction, sort_field))
-    elif sort_order == 'asc':
+    elif sort_order == "asc":
         order_clause = getattr(Transaction, sort_field)
     else:
-        return jsonify({"error": "Invalid sort order. Allowed orders are 'asc' or 'desc'"}), 400
+        return (
+            jsonify(
+                {"error": "Invalid sort order. Allowed orders are 'asc' or 'desc'"}
+            ),
+            400,
+        )
 
     # 쿼리 생성
     if deposit_account_id:
-        query = db.session.query(Transaction).filter(Transaction.Deposit_Account_ID == deposit_account_id).order_by(order_clause)
+        query = (
+            db.session.query(Transaction)
+            .filter(Transaction.Deposit_Account_ID == deposit_account_id)
+            .order_by(order_clause)
+        )
     else:
         query = db.session.query(Transaction).order_by(order_clause)
 
@@ -672,43 +804,69 @@ def query_transactions_sorted():
 
     # 결과 반환
     return (
-        jsonify({
-            "message": "쿼리 성공.",
-            "transactions": [{
-                "Transaction_Number": transaction.Transaction_Number,
-                "Deposit_Account_ID": transaction.Deposit_Account_ID,
-                "Data_Of_Deposit_Withdrawal": transaction.Data_Of_Deposit_Withdrawal.strftime('%Y-%m-%d %H:%M:%S'),
-                "Transaction_Amount": transaction.Transaction_Amount,
-                "Balance": transaction.Balance,
-                "Details_Of_Transaction": transaction.Details_Of_Transaction,
-            } for transaction in result]
-        }),
+        jsonify(
+            {
+                "message": "쿼리 성공.",
+                "transactions": [
+                    {
+                        "Transaction_Number": transaction.Transaction_Number,
+                        "Deposit_Account_ID": transaction.Deposit_Account_ID,
+                        "Data_Of_Deposit_Withdrawal": transaction.Data_Of_Deposit_Withdrawal.strftime(
+                            "%Y-%m-%d %H:%M:%S"
+                        ),
+                        "Transaction_Amount": transaction.Transaction_Amount,
+                        "Balance": transaction.Balance,
+                        "Details_Of_Transaction": transaction.Details_Of_Transaction,
+                    }
+                    for transaction in result
+                ],
+            }
+        ),
         200,
     )
 
-@app.route('/query/cards/sorted', methods=['GET'])
+
+@app.route("/query/cards/sorted", methods=["GET"])
 def query_cards_sorted():
     # 정렬 기준 및 방향 받기
-    sort_field = request.args.get('field', 'Date_Of_Application')  # 기본 필드는 Date_Of_Application
-    sort_order = request.args.get('order', 'asc')                 # 기본 정렬은 오름차순
-    card_id = request.args.get('card_id')
+    sort_field = request.args.get(
+        "field", "Date_Of_Application"
+    )  # 기본 필드는 Date_Of_Application
+    sort_order = request.args.get("order", "asc")  # 기본 정렬은 오름차순
+    card_id = request.args.get("card_id")
 
     # 지원하는 정렬 필드와 유효성 검사
-    valid_fields = ['Date_Of_Application', 'Card_Type', 'Limit_Amount']
+    valid_fields = ["Date_Of_Application", "Card_Type", "Limit_Amount"]
     if sort_field not in valid_fields:
-        return jsonify({"error": f"Invalid sort field. Allowed fields are {', '.join(valid_fields)}"}), 400
+        return (
+            jsonify(
+                {
+                    "error": f"Invalid sort field. Allowed fields are {', '.join(valid_fields)}"
+                }
+            ),
+            400,
+        )
 
     # 정렬 방향 설정
-    if sort_order == 'desc':
+    if sort_order == "desc":
         order_clause = db.desc(getattr(Card, sort_field))
-    elif sort_order == 'asc':
+    elif sort_order == "asc":
         order_clause = getattr(Card, sort_field)
     else:
-        return jsonify({"error": "Invalid sort order. Allowed orders are 'asc' or 'desc'"}), 400
+        return (
+            jsonify(
+                {"error": "Invalid sort order. Allowed orders are 'asc' or 'desc'"}
+            ),
+            400,
+        )
 
     # 쿼리 생성
     if card_id:
-        query = db.session.query(Card).filter(Card.Card_ID == card_id).order_by(order_clause)
+        query = (
+            db.session.query(Card)
+            .filter(Card.Card_ID == card_id)
+            .order_by(order_clause)
+        )
     else:
         query = db.session.query(Card).order_by(order_clause)
 
@@ -720,20 +878,144 @@ def query_cards_sorted():
 
     # 결과 반환
     return (
-        jsonify({
-            "message": "쿼리 성공.",
-            "cards": [{
-                "Card_ID": card.Card_ID,
-                "Card_Type": card.Card_Type,
-                "Limit_Amount": card.Limit_Amount,
-                "Payment_Date": card.Payment_Date,
-                "Date_Of_Application": card.Date_Of_Application.strftime("%Y-%m-%d"),
-                "Customer_Resident_Registration_Number": card.Customer_Resident_Registration_Number,
-                "Deposit_Account_ID": card.Deposit_Account_ID,
-            } for card in result]
-        }),
+        jsonify(
+            {
+                "message": "쿼리 성공.",
+                "cards": [
+                    {
+                        "Card_ID": card.Card_ID,
+                        "Card_Type": card.Card_Type,
+                        "Limit_Amount": card.Limit_Amount,
+                        "Payment_Date": card.Payment_Date,
+                        "Date_Of_Application": card.Date_Of_Application.strftime(
+                            "%Y-%m-%d"
+                        ),
+                        "Customer_Resident_Registration_Number": card.Customer_Resident_Registration_Number,
+                        "Deposit_Account_ID": card.Deposit_Account_ID,
+                    }
+                    for card in result
+                ],
+            }
+        ),
         200,
     )
+
+
+@app.route("/query/transactions/last_month", methods=["GET"])
+def query_last_month_transactions():
+    deposit_account = request.args.get(
+        "deposit_account"
+    )  # 기본 필드는 Date_Of_Application
+    one_month_ago = datetime.now() - timedelta(days=30)
+
+    # 쿼리 작성
+    if deposit_account:
+        query = (
+            db.session.query(Transaction)
+            .join(
+                DepositAccount,
+                DepositAccount.Deposit_Account_ID == Transaction.Deposit_Account_ID,
+            )
+            .join(
+                Customer,
+                Customer.Resident_Registration_Number
+                == DepositAccount.Customer_Resident_Registration_Number,
+            )
+            .filter(DepositAccount.Deposit_Account_ID == deposit_account)
+            .filter(Transaction.Data_Of_Deposit_Withdrawal >= one_month_ago)
+            .order_by(Transaction.Data_Of_Deposit_Withdrawal.desc())
+        )
+    else:
+        query = (
+            db.session.query(Transaction)
+            .join(
+                DepositAccount,
+                DepositAccount.Deposit_Account_ID == Transaction.Deposit_Account_ID,
+            )
+            .join(
+                Customer,
+                Customer.Resident_Registration_Number
+                == DepositAccount.Customer_Resident_Registration_Number,
+            )
+            .filter(Transaction.Data_Of_Deposit_Withdrawal >= one_month_ago)
+            .order_by(Transaction.Data_Of_Deposit_Withdrawal.desc())
+        )
+
+    print(str(query.statement.compile(dialect=db.engine.dialect)))  # 쿼리 출력
+
+    # 결과 실행
+    transactions = query.all()
+    return jsonify(
+        {
+            "message": "쿼리 성공.",
+            "transactions": [
+                {
+                    "Transaction_Number": t.Transaction_Number,
+                    "Deposit_Account_ID": t.Deposit_Account_ID,
+                    "Transaction_Amount": t.Transaction_Amount,
+                    "Details_Of_Transaction": t.Details_Of_Transaction,
+                    "Data_Of_Deposit_Withdrawal": t.Data_Of_Deposit_Withdrawal.strftime(
+                        "%Y-%m-%d %H:%M:%S"
+                    ),
+                    "Balance": t.Balance,
+                }
+                for t in transactions
+            ],
+        }
+    )
+
+
+@app.route("/query/nearest_birthday", methods=["GET"])
+def query_nearest_birthday():
+    today = datetime.now().date()
+
+    # Customer model is used within the query
+    query = (
+        db.session.query(Customer)
+        .order_by(
+            db.func.abs(
+                db.func.datediff(
+                    db.func.concat(
+                        db.func.year(today),
+                        "-",
+                        db.func.month(Customer.Date_Of_Birth),
+                        "-",
+                        db.func.day(Customer.Date_Of_Birth)
+                    ),
+                    today
+                )
+            ).asc()
+        )
+        .limit(1)
+    )
+
+
+    print(str(query.statement.compile(dialect=db.engine.dialect)))  # 쿼리 출력
+
+    # Result handling
+    result = query.first()
+
+    if result:
+        return jsonify(
+            {
+                "message": "쿼리 성공.",
+                "customers": [{
+                    "Resident_Registration_Number": result.Resident_Registration_Number,
+                    "Name": result.Name,
+                    "Address": result.Address,
+                    "Date_Of_Birth": (
+                        result.Date_Of_Birth.strftime("%Y-%m-%d")
+                        if result.Date_Of_Birth
+                        else None
+                    ),
+                    "Email": result.Email,
+                    "Phone_Number": result.Phone_Number,
+                    "Occupation": result.Occupation,
+                }],
+            }
+        )
+    else:
+        return jsonify({"message": "결과 없음."})
 
 
 if __name__ == "__main__":

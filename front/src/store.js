@@ -157,7 +157,7 @@ const store = createStore({
       try {
         const response = await axios.post("/add_transaction", transactions);
         commit("addTransactions", response.data.transaction); // Vuex 상태 업데이트
-        commit("calcTotalBalance", response.data.transaction.Balance)
+        commit("calcTotalBalance", response.data.transaction.Transaction_Amount)
         dispatch('fetchTransaction');
       } catch (error) {
         console.error("Error posting transaction:", error);
@@ -174,13 +174,13 @@ const store = createStore({
       commit('setsearchedCustomer', resident_registration_number);
     },
 
-    async searchDepositAccount({ commit }, deposit_account_id) {
+    async searchDepositAccount({ commit }, Customer_Resident_Registration_Number) {
       const response = await axios.get('/query/deposit_account/pk', {
-        params: { deposit_account_id: deposit_account_id } // 쿼리 파라미터
+        params: { resident_registration_number: Customer_Resident_Registration_Number } // 쿼리 파라미터
       });
 
       commit("setDepositAccount", response.data.deposit_account)
-      commit('setsearchedDepositAccount', deposit_account_id);
+      commit('setsearchedDepositAccount', Customer_Resident_Registration_Number);
     },
 
     async searchCard({ commit }, card_id) {
@@ -211,7 +211,7 @@ const store = createStore({
 
     async sortDepositAccount({ state, commit }, data) {
       const response = await axios.get('/query/deposit_accounts/sorted', {
-        params: { field: data.field, order: data.order, deposit_account_id: state.searchedDepositAccount }
+        params: { field: data.field, order: data.order, resident_registration_number: state.searchedDepositAccount }
       });
 
       commit("setDepositAccount", response.data.deposit_accounts)
@@ -232,6 +232,20 @@ const store = createStore({
 
       commit("setCard", response.data.cards)
     },
+
+    async queryTransactionsLastMonth({ state, commit }) {
+      const response = await axios.get('query/transactions/last_month', {
+        params: { deposit_account: state.searchedTransaction }
+      });
+
+      commit("setTransactions", response.data.transactions)
+    },
+
+    async queryNearestBirthday({ commit }) {
+      const response = await axios.get('query/nearest_birthday');
+
+      commit("setCustomers", response.data.customers)
+    }
   },
 
   getters: {

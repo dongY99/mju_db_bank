@@ -9,5 +9,3 @@ services:
       - MYSQL_DATABASE=mydb
       - MYSQL_USER=user
       - MYSQL_PASSWORD=password
-    volumes:
-      - C:\mju_db_bank\data:/var/lib/mysql

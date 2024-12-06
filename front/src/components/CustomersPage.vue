@@ -18,8 +18,11 @@
           <li><a class="dropdown-item" @click="sortCustomerFront('Address', 'desc')">내림차순</a></li>
         </ul>
       </li>
-      <li class="nav-item col">
-        <a class="nav-link" aria-current="page">생년월일</a>
+      <li class="nav-item dropdown col">
+        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false">생년월일</a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" @click="queryNearestBirthdayFront">가장 가까운 생일</a></li>
+        </ul>
       </li>
       <li class="nav-item col">
         <a class="nav-link" aria-current="page">이메일</a>
@@ -65,11 +68,15 @@ export default {
   },
 
   methods: {
-    ...mapActions(["sortCustomer"]),
+    ...mapActions(["sortCustomer", "queryNearestBirthday"]),
 
     async sortCustomerFront(field, order) {
       const data = {field, order};
       await this.sortCustomer(data);
+    },
+
+    async queryNearestBirthdayFront() {
+      await this.queryNearestBirthday();
     }
   }
 }
