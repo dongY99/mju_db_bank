@@ -1,13 +1,18 @@
 <template>
   <div>
     <!-- Modal Trigger -->
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" :data-bs-target="'#cardModal' + index">
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" :data-bs-target="'#cardModal' + index + isUpdate"
+      v-if="!isUpdate">
       카드 추가
+    </button>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" :data-bs-target="'#cardModal' + index + isUpdate"
+      v-if="isUpdate">
+      카드 수정
     </button>
 
     <!-- Modal -->
-    <div class="modal fade" :id="'cardModal' + index" tabindex="-1" :aria-labelledby="'cardModalLabel' + index"
-      aria-hidden="true">
+    <div class="modal fade" :id="'cardModal' + index + isUpdate" tabindex="-1"
+      :aria-labelledby="'cardModalLabel' + index + isUpdate" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
@@ -71,6 +76,8 @@ export default {
   props: {
     deposit: Object,
     index: Number,
+    isUpdate: Boolean,
+    c: Object,
   },
   data() {
     return {
@@ -80,8 +87,8 @@ export default {
         Limit_Amount: 0,
         Payment_Date: 0,
         Card_Type: "",
-        Customer_Resident_Registration_Number: this.deposit.Customer_Resident_Registration_Number, // 고객 주민등록번호
-        Deposit_Account_ID: this.deposit.Deposit_Account_ID,
+        Customer_Resident_Registration_Number: "", // 고객 주민등록번호
+        Deposit_Account_ID: "",
       },
       errors: {
         Date_Of_Application: false,
@@ -97,7 +104,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions(["postCard"]), // Vuex 액션 맵핑
+    ...mapActions(["postCard", "updateCard"]), // Vuex 액션 맵핑
 
     validateForm() {
       // 신청일 검증
@@ -120,8 +127,8 @@ export default {
         Limit_Amount: 0,
         Payment_Date: 0,
         Card_Type: "",
-        Customer_Resident_Registration_Number: this.deposit.Customer_Resident_Registration_Number, // 고객 주민등록번호
-        Deposit_Account_ID: this.deposit.Deposit_Account_ID,
+        Customer_Resident_Registration_Number: "", // 고객 주민등록번호
+        Deposit_Account_ID: "",
       };
       this.errors = {
         Date_Of_Application: false,
@@ -140,7 +147,17 @@ export default {
         }
 
         // POST 요청
-        await this.postCard(this.card);
+        if (this.isUpdate) {
+          this.card.Card_ID = this.c.Card_ID
+          this.card.Customer_Resident_Registration_Number = this.c.Customer_Resident_Registration_Number
+          this.card.Deposit_Account_ID = this.c.Deposit_Account_ID
+          await this.updateCard(this.card)
+        } else {
+          this.card.Customer_Resident_Registration_Number = this.deposit.Customer_Resident_Registration_Number
+          this.card.Deposit_Account_ID = this.deposit.Deposit_Account_ID
+          await this.postCard(this.card);
+        }
+
 
         alert("카드가 성공적으로 추가되었습니다.");
         this.resetForm();

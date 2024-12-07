@@ -32,6 +32,7 @@
         <a class="nav-link" aria-current="page">고객 주민번호</a>
       </li>
       <li class="col"></li>
+      <li class="col"></li>
     </ul>
   </div>
   <ul v-for="(deposit, index) in depositAccount" :key="index" class="list-group list-group-horizontal row">
@@ -42,11 +43,13 @@
     <li class="list-group-item col"> {{ deposit.Data_Of_Opening }}</li>
     <li class="list-group-item col"> {{ deposit.Customer_Resident_Registration_Number }}</li>
     <CardForm :deposit="deposit" :index="index" class="col"/>
+    <DepositAccountForm :isUpdate="true" :deposit="deposit" class="col"/>
   </ul>
 </template>
 
 <script>
 import CardForm from "./CardForm.vue";
+import DepositAccountForm from "./DepositAccountForm.vue";
 import { mapState, mapActions } from "vuex";
 
 export default {
@@ -59,6 +62,7 @@ export default {
 
   components: {
     CardForm,
+    DepositAccountForm,
   },
 
   computed: {

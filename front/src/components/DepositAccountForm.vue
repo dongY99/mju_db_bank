@@ -1,12 +1,15 @@
 <template>
   <div>
     <!-- Modal Trigger -->
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" :data-bs-target="'#depositAccountModal'+index">
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" :data-bs-target="'#depositAccountModal'+index+isUpdate" v-if="!isUpdate">
       예금 계좌 추가
+    </button>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" :data-bs-target="'#depositAccountModal'+index+isUpdate" v-if="isUpdate">
+      예금 계좌 수정
     </button>
 
     <!-- Modal -->
-    <div class="modal fade" :id="'depositAccountModal'+index" tabindex="-1" :aria-labelledby="'depositAccountModalLabel'+index"
+    <div class="modal fade" :id="'depositAccountModal'+index+isUpdate" tabindex="-1" :aria-labelledby="'depositAccountModalLabel'+index+isUpdate"
       aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -74,7 +77,7 @@ export default {
         Balance: 0,
         Card_Application_Status: false,
         Data_Of_Opening: "",
-        Customer_Resident_Registration_Number: this.customer.Resident_Registration_Number,
+        Customer_Resident_Registration_Number: "",
       },
       errors: {
         Account_Type: false,
@@ -92,11 +95,13 @@ export default {
 
   props: {
     customer: Object,
+    deposit: Object,
     index: Number,
+    isUpdate: Boolean,
   },
 
   methods: {
-    ...mapActions(["postDepositAccount"]), // Vuex 액션 맵핑
+    ...mapActions(["postDepositAccount", "updateDepositAccount"]), // Vuex 액션 맵핑
 
     validateForm() {
       // 계좌 종류 검증
@@ -116,7 +121,7 @@ export default {
         Balance: 0,
         Card_Application_Status: false,
         Data_Of_Opening: "",
-        Customer_Resident_Registration_Number: this.customer.Resident_Registration_Number,
+        Customer_Resident_Registration_Number: "",
       };
       this.errors = {
         Account_Type: false,
@@ -135,7 +140,15 @@ export default {
         }
 
         // POST 요청
-        await this.postDepositAccount(this.depositAccount);
+        if (this.isUpdate) {
+          this.depositAccount.Customer_Resident_Registration_Number = this.deposit.Customer_Resident_Registration_Number
+          this.depositAccount.Deposit_Account_ID = this.deposit.Deposit_Account_ID
+          await this.updateDepositAccount(this.depositAccount);
+        } else {
+          this.depositAccount.Customer_Resident_Registration_Number = this.customer.Resident_Registration_Number
+          await this.postDepositAccount(this.depositAccount);
+        }
+        
 
         alert("예금 계좌가 성공적으로 추가되었습니다.");
         this.resetForm();

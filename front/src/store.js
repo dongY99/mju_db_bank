@@ -257,11 +257,6 @@ const store = createStore({
 
       dispatch('fetchDepositAccount')
     },
-    async updateTransaction({ dispatch }, new_transaction) {
-      await axios.put('/update_transaction', new_transaction)
-
-      dispatch('fetchTransaction')
-    },
     async updateCard({ dispatch }, new_card) {
       await axios.put('/update_card', new_card)
 

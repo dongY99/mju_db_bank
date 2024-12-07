@@ -34,6 +34,7 @@
       <li class="nav-item col">
         <a class="nav-link" aria-current="page">예금계좌 ID</a>
       </li>
+      <li class="col"></li>
     </ul>
   </div>
   <ul v-for="(c, index) in card" :key="index" class="list-group list-group-horizontal row">
@@ -44,11 +45,13 @@
     <li class="list-group-item col"> {{ c.Card_Type }}</li>
     <li class="list-group-item col"> {{ c.Customer_Resident_Registration_Number }}</li>
     <li class="list-group-item col"> {{ c.Deposit_Account_ID }}</li>
+    <CardForm :isUpdate="true" :c="c" class="col" />
   </ul>
 </template>
 
 <script>
 import { mapState, mapActions } from "vuex";
+import CardForm from "./CardForm.vue";
 
 export default {
   name: 'CardPage',
@@ -56,6 +59,9 @@ export default {
     return {
 
     }
+  },
+  components: {
+    CardForm,
   },
 
   computed: {

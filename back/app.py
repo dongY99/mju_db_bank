@@ -414,7 +414,7 @@ def add_card():
             Card_Type=Card_Type,
             Limit_Amount=Limit_Amount,
             Payment_Date=Payment_Date,
-            Date_Of_Application=Date_Of_Application.strftime("%Y-%m-%d"),
+            Date_Of_Application=Date_Of_Application,
             Customer_Resident_Registration_Number=Customer_Resident_Registration_Number,
             Deposit_Account_ID=Deposit_Account_ID,
         )
@@ -433,7 +433,7 @@ def add_card():
                         "Card_Type": Card_Type,
                         "Limit_Amount": Limit_Amount,
                         "Payment_Date": Payment_Date,
-                        "Date_Of_Application": Date_Of_Application.strftime("%Y-%m-%d"),
+                        "Date_Of_Application": new_card.Date_Of_Application.strftime("%Y-%m-%d"),
                         "Customer_Resident_Registration_Number": Customer_Resident_Registration_Number,
                         "Deposit_Account_ID": Deposit_Account_ID,
                     },
@@ -1065,33 +1065,6 @@ def update_deposit_account():
 
         db.session.commit()
         return jsonify({"message": "Deposit account updated successfully", "deposit_account": data}), 200
-
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({"error": "An error occurred", "details": str(e)}), 500
-
-
-@app.route('/update_transaction', methods=['PUT'])
-def update_transaction():
-    try:
-        data = request.get_json()
-        transaction_number = data.get('Transaction_Number')
-        if not transaction_number:
-            return jsonify({"error": "Transaction_Number is required"}), 400
-
-        transaction = db.session.get(Transaction, transaction_number)
-        if not transaction:
-            return jsonify({"error": "Transaction not found"}), 404
-
-        # Update fields if provided
-        transaction.Deposit_Account_ID = data.get('Deposit_Account_ID', transaction.Deposit_Account_ID)
-        transaction.Transaction_Amount = data.get('Transaction_Amount', transaction.Transaction_Amount)
-        transaction.Balance = data.get('Balance', transaction.Balance)
-        transaction.Details_Of_Transaction = data.get('Details_Of_Transaction', transaction.Details_Of_Transaction)
-        transaction.Data_Of_Deposit_Withdrawal = data.get('Data_Of_Deposit_Withdrawal', transaction.Data_Of_Deposit_Withdrawal)
-
-        db.session.commit()
-        return jsonify({"message": "Transaction updated successfully", "transaction": data}), 200
 
     except Exception as e:
         db.session.rollback()
