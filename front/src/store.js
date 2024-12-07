@@ -234,7 +234,7 @@ const store = createStore({
     },
 
     async queryTransactionsLastMonth({ state, commit }) {
-      const response = await axios.get('query/transactions/last_month', {
+      const response = await axios.get('/query/transactions/last_month', {
         params: { deposit_account: state.searchedTransaction }
       });
 
@@ -242,10 +242,31 @@ const store = createStore({
     },
 
     async queryNearestBirthday({ commit }) {
-      const response = await axios.get('query/nearest_birthday');
+      const response = await axios.get('/query/nearest_birthday');
 
       commit("setCustomers", response.data.customers)
-    }
+    },
+
+    async updateCustomer({ dispatch }, new_customer) {
+      await axios.put('/update_customer', new_customer)
+
+      dispatch('fetchCustomers')
+    },
+    async updateDepositAccount({ dispatch }, new_deposit_account) {
+      await axios.put('/update_deposit_account', new_deposit_account)
+
+      dispatch('fetchDepositAccount')
+    },
+    async updateTransaction({ dispatch }, new_transaction) {
+      await axios.put('/update_transaction', new_transaction)
+
+      dispatch('fetchTransaction')
+    },
+    async updateCard({ dispatch }, new_card) {
+      await axios.put('/update_card', new_card)
+
+      dispatch('fetchCard')
+    },
   },
 
   getters: {

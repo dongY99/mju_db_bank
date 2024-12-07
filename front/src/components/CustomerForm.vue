@@ -1,14 +1,18 @@
 <template>
   <div>
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" :data-bs-target="'#exampleModal' + isUpdate" v-if="!isUpdate">
       회원 추가
     </button>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" :data-bs-target="'#exampleModal' + isUpdate" v-if="isUpdate">
+      회원 수정
+    </button>
 
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" :id="'exampleModal' + isUpdate" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h1 class="modal-title fs-5" id="exampleModalLabel">회원가입</h1>
+            <h1 class="modal-title fs-5" :id="'exampleModalLabel' + isUpdate">회원가입</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
@@ -160,6 +164,9 @@ export default {
       this.updateDays(newMonth);
     }
   },
+  props: {
+    isUpdate: Boolean
+  },
 
 
   computed: {
@@ -170,7 +177,7 @@ export default {
 
 
   methods: {
-    ...mapActions(['postCustomer']),
+    ...mapActions(['postCustomer', 'updateCustomer']),
 
     updateDays(month = this.selectedMonth) {
       const daysInMonth = new Date(this.selectedYear, month, 0).getDate();
@@ -200,6 +207,8 @@ export default {
         Phone_Number: '',
         Occupation: '',
       };
+
+      document.activeElement.blur(); // 현재 포커스 제거
     },
     validateForm() {
       // 이름 검증
@@ -241,8 +250,13 @@ export default {
         this.customer.Date_Of_Birth = selectedDate.toISOString().slice(0, 10);
 
         // Flask API로 POST 요청 보내기
-        await this.postCustomer(this.customer); // 백엔드에 POST 요청 및 Store 업데이트
-
+        console.log(this.isUpdate)
+        if (this.isUpdate) {
+          await this.updateCustomer(this.customer);
+        } else {
+          await this.postCustomer(this.customer); // 백엔드에 POST 요청 및 Store 업데이트
+        }
+        
         // 입력 필드 초기화
         this.resetData();
 

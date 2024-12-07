@@ -1017,6 +1017,113 @@ def query_nearest_birthday():
     else:
         return jsonify({"message": "결과 없음."})
 
+@app.route('/update_customer', methods=['PUT'])
+def update_customer():
+    try:
+        data = request.get_json()
+        resident_registration_number = data.get('Resident_Registration_Number')
+        if not resident_registration_number:
+            return jsonify({"error": "Resident_Registration_Number is required"}), 400
 
+        customer = db.session.get(Customer, resident_registration_number)
+        if not customer:
+            return jsonify({"error": "Customer not found"}), 404
+
+        # Update fields if provided
+        customer.Name = data.get('Name', customer.Name)
+        customer.Address = data.get('Address', customer.Address)
+        customer.Date_Of_Birth = data.get('Date_Of_Birth', customer.Date_Of_Birth)
+        customer.Email = data.get('Email', customer.Email)
+        customer.Phone_Number = data.get('Phone_Number', customer.Phone_Number)
+        customer.Occupation = data.get('Occupation', customer.Occupation)
+
+        db.session.commit()
+        return jsonify({"message": "Customer updated successfully", "customer": data}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "An error occurred", "details": str(e)}), 500
+
+
+@app.route('/update_deposit_account', methods=['PUT'])
+def update_deposit_account():
+    try:
+        data = request.get_json()
+        deposit_account_id = data.get('Deposit_Account_ID')
+        if not deposit_account_id:
+            return jsonify({"error": "Deposit_Account_ID is required"}), 400
+
+        deposit_account = db.session.get(DepositAccount, deposit_account_id)
+        if not deposit_account:
+            return jsonify({"error": "Deposit account not found"}), 404
+
+        # Update fields if provided
+        deposit_account.Account_Type = data.get('Account_Type', deposit_account.Account_Type)
+        deposit_account.Balance = data.get('Balance', deposit_account.Balance)
+        deposit_account.Card_Application_Status = data.get('Card_Application_Status', deposit_account.Card_Application_Status)
+        deposit_account.Data_Of_Opening = data.get('Data_Of_Opening', deposit_account.Data_Of_Opening)
+
+        db.session.commit()
+        return jsonify({"message": "Deposit account updated successfully", "deposit_account": data}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "An error occurred", "details": str(e)}), 500
+
+
+@app.route('/update_transaction', methods=['PUT'])
+def update_transaction():
+    try:
+        data = request.get_json()
+        transaction_number = data.get('Transaction_Number')
+        if not transaction_number:
+            return jsonify({"error": "Transaction_Number is required"}), 400
+
+        transaction = db.session.get(Transaction, transaction_number)
+        if not transaction:
+            return jsonify({"error": "Transaction not found"}), 404
+
+        # Update fields if provided
+        transaction.Deposit_Account_ID = data.get('Deposit_Account_ID', transaction.Deposit_Account_ID)
+        transaction.Transaction_Amount = data.get('Transaction_Amount', transaction.Transaction_Amount)
+        transaction.Balance = data.get('Balance', transaction.Balance)
+        transaction.Details_Of_Transaction = data.get('Details_Of_Transaction', transaction.Details_Of_Transaction)
+        transaction.Data_Of_Deposit_Withdrawal = data.get('Data_Of_Deposit_Withdrawal', transaction.Data_Of_Deposit_Withdrawal)
+
+        db.session.commit()
+        return jsonify({"message": "Transaction updated successfully", "transaction": data}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "An error occurred", "details": str(e)}), 500
+
+
+@app.route('/update_card', methods=['PUT'])
+def update_card():
+    try:
+        data = request.get_json()
+        card_id = data.get('Card_ID')
+        if not card_id:
+            return jsonify({"error": "Card_ID is required"}), 400
+
+        card = db.session.get(Card, card_id)
+        if not card:
+            return jsonify({"error": "Card not found"}), 404
+
+        # Update fields if provided
+        card.Date_Of_Application = data.get('Date_Of_Application', card.Date_Of_Application)
+        card.Limit_Amount = data.get('Limit_Amount', card.Limit_Amount)
+        card.Payment_Date = data.get('Payment_Date', card.Payment_Date)
+        card.Card_Type = data.get('Card_Type', card.Card_Type)
+        card.Customer_Resident_Registration_Number = data.get('Customer_Resident_Registration_Number', card.Customer_Resident_Registration_Number)
+        card.Deposit_Account_ID = data.get('Deposit_Account_ID', card.Deposit_Account_ID)
+
+        db.session.commit()
+        return jsonify({"message": "Card updated successfully", "card": data}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "An error occurred", "details": str(e)}), 500
+    
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
