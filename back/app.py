@@ -826,7 +826,7 @@ def query_transactions_sorted():
     )
 
 
-@app.route("/query/cards/sorted", methods=["GET"])
+@app.route("/query/card/sorted", methods=["GET"])
 def query_cards_sorted():
     # 정렬 기준 및 방향 받기
     sort_field = request.args.get(
